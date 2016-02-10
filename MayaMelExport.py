@@ -1,10 +1,10 @@
 #
 #
-# 3DE4.script.name:	Maya...
+# 3DE4.script.name:	mel export...
 #
-# 3DE4.script.version:	v1.9
+# 3DE4.script.version:	v0.1
 #
-# 3DE4.script.gui:	Main Window::3DE4::Export Project
+# 3DE4.script.gui:	Main Window::ford
 #
 # 3DE4.script.comment:	Creates a MEL script file that contains all project data, which can be imported into Autodesk Maya.
 #
@@ -63,11 +63,11 @@ def prepareImagePath(path,startframe):
 		path2		= fstring%(path[0:i0],startframe,path[i0+n:len(path)])
 		path		= path2
 	return path
-	
+
 
 #
 # main script...
-		
+
 
 #
 # search for camera point group...
@@ -107,28 +107,28 @@ if ret==1:
 	frame0	-= 1
 	hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
 	if path!=None:
-		if not path.endswith('.mel'): path = path+'.mel' 
+		if not path.endswith('.mel'): path = path+'.mel'
 		f	= open(path,"w")
 		if not f.closed:
-			
+
 			#
 			# write some comments...
-			
+
 			f.write("//\n")
 			f.write("// Maya/MEL export data written by %s\n"%tde4.get3DEVersion())
 			f.write("//\n")
 			f.write("// All lengths are in centimeter, all angles are in degree.\n")
 			f.write("//\n\n")
-			
+
 			#
 			# write scene group...
-			
+
 			f.write("// create scene group...\n")
 			f.write("string $sceneGroupName = `group -em -name \"Scene\"`;\n")
-			
+
 			#
 			# write cameras...
-			
+
 			cl	= tde4.getCameraList()
 			index	= 1
 			for cam in cl:
@@ -145,16 +145,16 @@ if ret==1:
 					focal		= tde4.getCameraFocalLength(cam,1)
 					lco_x		= tde4.getLensLensCenterX(lens)
 					lco_y		= tde4.getLensLensCenterY(lens)
-					
+
 					# convert filmback to inch...
 					fback_w		= fback_w/2.54
 					fback_h		= fback_h/2.54
 					lco_x		= -lco_x/2.54
 					lco_y		= -lco_y/2.54
-					
+
 					# convert focal length to mm...
 					focal		= focal*10.0
-					
+
 					# create camera...
 					f.write("\n")
 					f.write("// create camera %s...\n"%name)
@@ -171,7 +171,7 @@ if ret==1:
 					rot	= convertToAngles(r3d)
 					f.write("xform -rotation %.15f %.15f %.15f $cameraTransform;\n"%rot)
 					f.write("xform -scale 1 1 1 $cameraTransform;\n")
-					
+
 					# image plane...
 					f.write("\n")
 					f.write("// create image plane...\n")
@@ -179,10 +179,10 @@ if ret==1:
 					f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
 					f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
 					f.write("setAttr ($imagePlane + \".offsetY\") %.15f;\n"%lco_y)
-					
+
 					if camType=="SEQUENCE": f.write("setAttr ($imagePlane+\".useFrameExtension\") 1;\n")
 					else:			f.write("setAttr ($imagePlane+\".useFrameExtension\") 0;\n")
-					
+
 					f.write("expression -n \"frame_ext_expression\" -s ($imagePlane+\".frameExtension=frame\");\n")
 					path	= tde4.getCameraPath(cam)
 					sattr	= tde4.getCameraSequenceAttr(cam)
@@ -191,22 +191,22 @@ if ret==1:
 					f.write("setAttr ($imagePlane + \".fit\") 4;\n")
 					f.write("setAttr ($imagePlane + \".displayOnlyIfCurrent\") 1;\n")
 					f.write("setAttr ($imagePlane  + \".depth\") (9000/2);\n")
-					
+
 					# parent camera to scene group...
 					f.write("\n")
 					f.write("// parent camera to scene group...\n")
 					f.write("parent $cameraTransform $sceneGroupName;\n")
-					
+
 					if camType=="REF_FRAME" and hide_ref:
 						f.write("setAttr ($cameraTransform +\".visibility\") 0;\n")
-					
+
 					# animate camera...
 					if camType!="REF_FRAME":
 						f.write("\n")
 						f.write("// animating camera %s...\n"%name)
 						f.write("playbackOptions -min %d -max %d;\n"%(1+frame0,noframes+frame0))
 						f.write("\n")
-					
+
 					frame	= 1
 					while frame<=noframes:
 						# rot/pos...
@@ -223,24 +223,24 @@ if ret==1:
 						f.write("setKeyframe -at rotateX -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[0]))
 						f.write("setKeyframe -at rotateY -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[1]))
 						f.write("setKeyframe -at rotateZ -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[2]))
-						
+
 						# focal length...
 						focal	= tde4.getCameraFocalLength(cam,frame)
 						focal	= focal*10.0
 						f.write("setKeyframe -at focalLength -t %d -v %.15f $cameraShape;\n"%(frame+frame0,focal))
-						
+
 						frame	+= 1
-					
+
 			#
 			# write camera point group...
-			
+
 			f.write("\n")
 			f.write("// create camera point group...\n")
 			name	= "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
 			f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
 			f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
 			f.write("\n")
-			
+
 			# write points...
 			l	= tde4.getPointList(campg)
 			for p in l:
@@ -255,15 +255,15 @@ if ret==1:
 					f.write("$locator = (\"|\" + $locator);\n")
 					f.write("xform -t %.15f %.15f %.15f $locator;\n"%(p3d[0],p3d[1],p3d[2]))
 					f.write("parent $locator $pointGroupName;\n")
-			
+
 			f.write("\n")
 			f.write("xform -zeroTransformPivots -rotateOrder zxy -scale 1.000000 1.000000 1.000000 $pointGroupName;\n")
 			f.write("\n")
-			
-			
+
+
 			#
 			# write object/mocap point groups...
-			
+
 			camera		= tde4.getCurrentCamera()
 			noframes	= tde4.getCameraNoFrames(camera)
 			pgl		= tde4.getPGroupList()
@@ -276,7 +276,7 @@ if ret==1:
 					index	+= 1
 					f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%pgname)
 					f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
-					
+
 					# write points...
 					l	= tde4.getPointList(pg)
 					for p in l:
@@ -291,7 +291,7 @@ if ret==1:
 							f.write("$locator = (\"|\" + $locator);\n")
 							f.write("xform -t %.15f %.15f %.15f $locator;\n"%(p3d[0],p3d[1],p3d[2]))
 							f.write("parent $locator $pointGroupName;\n")
-					
+
 					f.write("\n")
 					scale	= tde4.getPGroupScale3D(pg)
 					f.write("xform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
@@ -315,9 +315,9 @@ if ret==1:
 						f.write("setKeyframe -at rotateX -t %d -v %.15f $pointGroupName; "%(frame+frame0,rot[0]))
 						f.write("setKeyframe -at rotateY -t %d -v %.15f $pointGroupName; "%(frame+frame0,rot[1]))
 						f.write("setKeyframe -at rotateZ -t %d -v %.15f $pointGroupName;\n"%(frame+frame0,rot[2]))
-						
+
 						frame	+= 1
-				
+
 				# mocap point groups...
 				if tde4.getPGroupType(pg)=="MOCAP" and camera!=None:
 					f.write("\n")
@@ -326,7 +326,7 @@ if ret==1:
 					index	+= 1
 					f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%pgname)
 					f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
-					
+
 					# write points...
 					l	= tde4.getPointList(pg)
 					for p in l:
@@ -347,7 +347,7 @@ if ret==1:
 								f.write("setKeyframe -at translateY -t %d -v %.15f $locator; "%(frame+frame0,p3d[1]))
 								f.write("setKeyframe -at translateZ -t %d -v %.15f $locator; "%(frame+frame0,p3d[2]))
 							f.write("parent $locator $pointGroupName;\n")
-					
+
 					f.write("\n")
 					scale	= tde4.getPGroupScale3D(pg)
 					f.write("xform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
@@ -371,20 +371,20 @@ if ret==1:
 						f.write("setKeyframe -at rotateX -t %d -v %.15f $pointGroupName; "%(frame+frame0,rot[0]))
 						f.write("setKeyframe -at rotateY -t %d -v %.15f $pointGroupName; "%(frame+frame0,rot[1]))
 						f.write("setKeyframe -at rotateZ -t %d -v %.15f $pointGroupName;\n"%(frame+frame0,rot[2]))
-						
+
 						frame	+= 1
-			
-			
+
+
 			#
 			# global (scene node) transformation...
-			
+
 			p3d	= tde4.getScenePosition3D()
 			p3d	= convertZup(p3d,yup)
 			r3d	= tde4.getSceneRotation3D()
 			rot	= convertToAngles(r3d)
 			s	= tde4.getSceneScale3D()
 			f.write("xform -zeroTransformPivots -rotateOrder zxy -translation %.15f %.15f %.15f -scale %.15f %.15f %.15f -rotation %.15f %.15f %.15f $sceneGroupName;\n\n"%(p3d[0],p3d[1],p3d[2],s,s,s,rot[0],rot[1],rot[2]))
-			
+
 			f.write("\n")
 			f.close()
 			tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
