@@ -1,3 +1,9 @@
+"""
+3DEqualizer maya mel script exporter
+3DE4r5 extended
+
+github/danielforgacs
+"""
 #
 #
 # 3DE4.script.name:	mel export...
@@ -17,6 +23,17 @@ from vl_sdv import *
 
 #
 # functions...
+
+
+def get_mel_filename():
+	projectpath = os.path.abspath(tde4.getProjectPath())
+	folder = os.path.dirname(projectpath)
+	projectname = os.path.basename(projectpath)
+	mel_name = projectname.replace('3de', 'mel')
+	path = os.path.join(folder, 'exports', mel_name)
+
+	return path
+
 
 def convertToAngles(r3d):
 	rot	= rot3d(mat3d(r3d)).angles(VL_APPLY_ZXY)
@@ -102,7 +119,8 @@ if ret==1:
 	# yup	= tde4.getWidgetValue(req,"mode_menu")
 	# if yup==2: yup = 0
 	yup	= 1
-	path	= tde4.getWidgetValue(req,"file_browser")
+	# path	= tde4.getWidgetValue(req,"file_browser")
+	path = get_mel_filename()
 	frame0	= float(tde4.getWidgetValue(req,"startframe_field"))
 	frame0	-= 1
 	hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
