@@ -20,7 +20,7 @@ github/danielforgacs
 # import sdv's python vector lib...
 
 import os
-import tde4
+# import tde4
 from vl_sdv import *
 
 #
@@ -34,7 +34,18 @@ def get_mel_filename():
 	mel_name = projectname.replace('3de', 'mel')
 	path = os.path.join(folder, 'exports', mel_name)
 
+	print('path: {0}'.format(path))
+
 	return path
+
+
+def get_frame_range():
+	cam_id = tde4.getCurrentCamera()
+	fstart, fend, step = tde4.getCameraSequenceAttr(cam_id)
+
+	print('frame range@ {0} -{1}'.format(fstart, fend))
+
+	return {'first': fstart, 'last': fend}
 
 
 def convertToAngles(r3d):
@@ -123,8 +134,13 @@ if ret==1:
 	yup	= 1
 	# path	= tde4.getWidgetValue(req,"file_browser")
 	path = get_mel_filename()
-	frame0	= float(tde4.getWidgetValue(req,"startframe_field"))
-	frame0	-= 1
+	# frame0	= float(tde4.getWidgetValue(req,"startframe_field"))
+	# frame0	-= 1
+	framerange = get_frame_range()
+	playbackoptions = 'playbackOptions -min {0} -max {1};'
+	playbackoptions = playbackoptions.format(framerange['first'], framerange['last'])
+	frame0 = framerange['first'] - 1
+
 	hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
 	if path!=None:
 		if not path.endswith('.mel'): path = path+'.mel'
@@ -224,8 +240,9 @@ if ret==1:
 					if camType!="REF_FRAME":
 						f.write("\n")
 						f.write("// animating camera %s...\n"%name)
-						f.write("playbackOptions -min %d -max %d;\n"%(1+frame0,noframes+frame0))
-						f.write("\n")
+						f.write(playbackoptions)
+						# f.write("playbackOptions -min %d -max %d;\n"%(1+frame0,noframes+frame0))
+						f.write("\n\n")
 
 					frame	= 1
 					while frame<=noframes:
