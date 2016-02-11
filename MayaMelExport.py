@@ -19,6 +19,8 @@ github/danielforgacs
 #
 # import sdv's python vector lib...
 
+import os
+import tde4
 from vl_sdv import *
 
 #

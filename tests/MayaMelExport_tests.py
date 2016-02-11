@@ -7,11 +7,6 @@ if location not in os.sys.path:
     os.sys.path.append(location)
 
 
-try:
-    import MayaMelExport
-except:
-    gui = None
-
 
 class FileComparisonTest(unittest.TestCase):
     def test__MayaMelExport__exports_same_mel(self):
@@ -26,4 +21,4 @@ class FileComparisonTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(module=__name__)
