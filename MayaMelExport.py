@@ -127,7 +127,9 @@ cam	= tde4.getCurrentCamera()
 offset	= tde4.getCameraFrameOffset(cam)
 tde4.setWidgetValue(req,"startframe_field",str(offset))
 
-ret	= tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+# ret	= tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+ret	= 1
+
 if ret==1:
 	# yup	= tde4.getWidgetValue(req,"mode_menu")
 	# if yup==2: yup = 0
