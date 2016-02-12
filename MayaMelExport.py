@@ -20,6 +20,7 @@ github/danielforgacs
 # import sdv's python vector lib...
 
 import os
+import socket
 import tde4
 from vl_sdv import *
 
@@ -522,6 +523,22 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 			else:
 				tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
+	return get_mel_filename()['path']
+
+
+def do_maya_import(path):
+	maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	maya.connect(('localhost', 6005))
+
+	# maya.send('source "/home/DForgacs/dev/3DEtools/tests/test_fixtures/exports/JTJ_0010_v009.mel";')
+	maya.send('\n\nprint "{path}";'.format(path=path))
+	maya.send('source "{path}"'.format(path=path))
+	maya.close()
+
+
 
 if __name__ == '__main__':
-	main()
+	melscript = main()
+	print(melscript)
+	do_maya_import(melscript)
+	print('--> Done...')
