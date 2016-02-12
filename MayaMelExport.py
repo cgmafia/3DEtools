@@ -3,6 +3,12 @@
 3DE4r5 extended
 
 github/danielforgacs
+
+features:
+	- mel file name = export/3de filename
+	- frame range comes from 3de settings
+
+todo:
 """
 #
 #
@@ -20,7 +26,7 @@ github/danielforgacs
 # import sdv's python vector lib...
 
 import os
-# import tde4
+import tde4
 from vl_sdv import *
 
 #
@@ -46,6 +52,31 @@ def get_frame_range():
 	print('frame range@ {0} -{1}'.format(fstart, fend))
 
 	return {'first': fstart, 'last': fend}
+
+
+
+def add_pipeline_attribs():
+	mel = """
+// add pipeline attribs
+addAttr -longName "source" -dataType "string" $cameraShape;
+addAttr -longName "fstart" -attributeType short $cameraShape;
+addAttr -longName "fend" -attributeType short $cameraShape;
+
+setAttr ($cameraShape + ".source") -type "string" "{source}";
+setAttr ($cameraShape + ".fstart") {fstart};
+setAttr ($cameraShape + ".fend") {fend};
+
+setAttr -lock on ($cameraShape + ".source");
+setAttr -lock on ($cameraShape + ".fstart");
+setAttr -lock on ($cameraShape + ".fend");
+"""
+
+	mel = mel.format(source=tde4.getProjectPath(),
+					fstart=get_frame_range()['first'],
+					fend=get_frame_range()['last'],
+				)
+
+	return mel
 
 
 def convertToAngles(r3d):
@@ -210,9 +241,12 @@ if ret==1:
 					f.write("xform -rotation %.15f %.15f %.15f $cameraTransform;\n"%rot)
 					f.write("xform -scale 1 1 1 $cameraTransform;\n")
 
+					"""add pipeline attributes to camerashape"""
+					attribs = add_pipeline_attribs()
+					f.write(attribs)
+
 					# image plane...
-					f.write("\n")
-					f.write("// create image plane...\n")
+					f.write("\n\n// create image plane...\n")
 					f.write("string $imagePlane = `createNode imagePlane`;\n")
 					f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
 					f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
