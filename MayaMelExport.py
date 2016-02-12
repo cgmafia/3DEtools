@@ -24,6 +24,16 @@ import socket
 import tde4
 from vl_sdv import *
 
+class MayaConnectWrapper(object):
+	def __enter__(self):
+		self.maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.maya.connect(('localhost', 6005))
+
+		return self.maya
+
+	def __exit__(self, type, value, traceback):
+		self.maya.close()
+
 #
 # functions...
 
@@ -530,13 +540,17 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 
 def do_maya_import(path):
-	maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	maya.connect(('localhost', 6005))
+	# maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	# maya.connect(('localhost', 6005))
 
-	# maya.send('source "/home/DForgacs/dev/3DEtools/tests/test_fixtures/exports/JTJ_0010_v009.mel";')
-	maya.send('\n\nprint "{path}";'.format(path=path))
-	maya.send('source "{path}"'.format(path=path))
-	maya.close()
+	# maya.send('\n\nprint "{path}";'.format(path=path))
+	# maya.send('source "{path}"'.format(path=path))
+	# maya.close()
+
+	with MayaConnectWrapper() as maya:
+		maya.send('\n\nprint "{path}";'.format(path=path))
+		maya.send('source "{path}"'.format(path=path))
+
 
 
 
