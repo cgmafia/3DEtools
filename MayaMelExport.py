@@ -54,6 +54,22 @@ def get_frame_range():
 	return {'first': fstart, 'last': fend}
 
 
+def get_cam_parms():
+	cam_id = tde4.getCurrentCamera()
+	focal = tde4.getCameraFocalLength(cam_id, 1)
+
+	return {'focal': focal}
+
+
+def get_filmback():
+	cam_id = tde4.getCurrentCamera()
+	lens_id = tde4.getCameraLens(cam_id)
+	filmback_w = tde4.getLensFBackWidth(lens_id)
+	filmback_h = tde4.getLensFBackHeight(lens_id)
+
+	return {'w': filmback_w, 'h': filmback_h}
+
+
 
 def add_pipeline_attribs():
 	mel = """
@@ -61,19 +77,32 @@ def add_pipeline_attribs():
 addAttr -longName "source" -dataType "string" $cameraShape;
 addAttr -longName "fstart" -attributeType short $cameraShape;
 addAttr -longName "fend" -attributeType short $cameraShape;
+addAttr -longName "focal" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
 
 setAttr ($cameraShape + ".source") -type "string" "{source}";
 setAttr ($cameraShape + ".fstart") {fstart};
 setAttr ($cameraShape + ".fend") {fend};
+setAttr ($cameraShape + ".focal") {focal};
+setAttr ($cameraShape + ".focal") {focal};
+setAttr ($cameraShape + ".filmback_w") {filmback_w};
+setAttr ($cameraShape + ".filmback_h") {filmback_h};
 
 setAttr -lock on ($cameraShape + ".source");
 setAttr -lock on ($cameraShape + ".fstart");
 setAttr -lock on ($cameraShape + ".fend");
+setAttr -lock on ($cameraShape + ".focal");
+setAttr -lock on ($cameraShape + ".filmback_w");
+setAttr -lock on ($cameraShape + ".filmback_h");
 """
 
 	mel = mel.format(source=tde4.getProjectPath(),
 					fstart=get_frame_range()['first'],
 					fend=get_frame_range()['last'],
+					focal=get_cam_parms()['focal'],
+					filmback_w=get_filmback()['w'],
+					filmback_h=get_filmback()['h'],
 				)
 
 	return mel
