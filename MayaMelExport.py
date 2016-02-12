@@ -51,8 +51,10 @@ def get_frame_range():
 def get_cam_parms():
 	cam_id = tde4.getCurrentCamera()
 	focal = tde4.getCameraFocalLength(cam_id, 1)
+	resx = tde4.getCameraImageWidth(cam_id)
+	resy = tde4.getCameraImageHeight(cam_id)
 
-	return {'focal': focal}
+	return {'focal': focal, 'id': cam_id, 'resx': resx, 'resy': resy}
 
 
 def get_filmback():
@@ -69,21 +71,29 @@ def add_pipeline_attribs():
 	mel = """
 // add pipeline attribs
 addAttr -longName "source" -dataType "string" $cameraShape;
-addAttr -longName "fstart" -attributeType short $cameraShape;
-addAttr -longName "fend" -attributeType short $cameraShape;
+addAttr -longName "footage" -dataType "string" $cameraShape;
+addAttr -longName "res_x" -attributeType "short" $cameraShape;
+addAttr -longName "res_y" -attributeType "short" $cameraShape;
 addAttr -longName "focal" -attributeType "float" $cameraShape;
 addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
 addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+addAttr -longName "fstart" -attributeType short $cameraShape;
+addAttr -longName "fend" -attributeType short $cameraShape;
 
 setAttr ($cameraShape + ".source") -type "string" "{source}";
-setAttr ($cameraShape + ".fstart") {fstart};
-setAttr ($cameraShape + ".fend") {fend};
-setAttr ($cameraShape + ".focal") {focal};
+setAttr ($cameraShape + ".footage") -type "string" "{footage}";
+setAttr ($cameraShape + ".res_x") {res_x};
+setAttr ($cameraShape + ".res_y") {res_y};
 setAttr ($cameraShape + ".focal") {focal};
 setAttr ($cameraShape + ".filmback_w") {filmback_w};
 setAttr ($cameraShape + ".filmback_h") {filmback_h};
+setAttr ($cameraShape + ".fstart") {fstart};
+setAttr ($cameraShape + ".fend") {fend};
 
 setAttr -lock on ($cameraShape + ".source");
+setAttr -lock on ($cameraShape + ".footage");
+setAttr -lock on ($cameraShape + ".res_x");
+setAttr -lock on ($cameraShape + ".res_y");
 setAttr -lock on ($cameraShape + ".fstart");
 setAttr -lock on ($cameraShape + ".fend");
 setAttr -lock on ($cameraShape + ".focal");
@@ -106,11 +116,14 @@ setAttr -lock on ($cameraTransform + ".scaleZ");
 """
 
 	mel = mel.format(source=tde4.getProjectPath(),
-					fstart=get_frame_range()['first'],
-					fend=get_frame_range()['last'],
+					footage=tde4.getCameraPath(get_cam_parms()['id']),
+					res_x=get_cam_parms()['resx'],
+					res_y=get_cam_parms()['resy'],
 					focal=get_cam_parms()['focal'],
 					filmback_w=get_filmback()['w'],
 					filmback_h=get_filmback()['h'],
+					fstart=get_frame_range()['first'],
+					fend=get_frame_range()['last'],
 				)
 
 	return mel
