@@ -35,6 +35,9 @@ def get_mel_filename():
 	mel_name = projectname.replace('3de', 'mel')
 	path = os.path.join(folder, 'exports', mel_name)
 
+	if not os.path.exists(os.path.join(folder, 'exports')):
+		os.mkdir(os.path.join(folder, 'exports'))
+
 	print('path: {0}'.format(path))
 
 	return {'path': path, 'filename': projectname}
