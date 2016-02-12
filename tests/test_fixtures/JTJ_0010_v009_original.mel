@@ -5,10 +5,10 @@
 //
 
 // create scene group...
-string $sceneGroupName = `group -em -name "mm_JTJ_0010_v009"`;
+string $sceneGroupName = `group -em -name "Scene"`;
 
-// create camera cam_mm_A121C001_150328_R4OY...
-string $cameraNodes[] = `camera -name "cam_mm_A121C001_150328_R4OY" -hfa 0.935433070866142  -vfa 0.526181102362205 -fl 14.016441952941541 -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff "overscan"`;
+// create camera A121C001_150328_R4OY_1_1...
+string $cameraNodes[] = `camera -name "A121C001_150328_R4OY_1_1" -hfa 0.935433070866142  -vfa 0.526181102362205 -fl 14.016441952941541 -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff "overscan"`;
 string $cameraTransform = $cameraNodes[0];
 string $cameraShape = $cameraNodes[1];
 xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;
@@ -17,52 +17,6 @@ setAttr ($cameraShape+".verticalFilmOffset") -0.000000000000000;
 xform -translation 1.978472652994061 -8.079773886417307 12.745353958857288 $cameraTransform;
 xform -rotation 15.795215258281354 -0.008103402948814 -0.812661468968629 $cameraTransform;
 xform -scale 1 1 1 $cameraTransform;
-
-// add pipeline attribs
-addAttr -longName "source" -dataType "string" $cameraShape;
-addAttr -longName "footage" -dataType "string" $cameraShape;
-addAttr -longName "res_x" -attributeType "short" $cameraShape;
-addAttr -longName "res_y" -attributeType "short" $cameraShape;
-addAttr -longName "focal" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
-addAttr -longName "fstart" -attributeType short $cameraShape;
-addAttr -longName "fend" -attributeType short $cameraShape;
-
-setAttr ($cameraShape + ".source") -type "string" "/home/DForgacs/dev/3DEtools/tests/test_fixtures/JTJ_0010_v009.3de";
-setAttr ($cameraShape + ".footage") -type "string" "/jobs/fsb/shots/jtj/jtj_0010/plates/fsb_jtj_0010_plates_EL/v001/2048x1152/fsb_jtj_0010_plates_EL_v001.####.exr";
-setAttr ($cameraShape + ".res_x") 2048;
-setAttr ($cameraShape + ".res_y") 1152;
-setAttr ($cameraShape + ".focal") 1.40164419529;
-setAttr ($cameraShape + ".filmback_w") 2.376;
-setAttr ($cameraShape + ".filmback_h") 1.3365;
-setAttr ($cameraShape + ".fstart") 1001;
-setAttr ($cameraShape + ".fend") 1245;
-
-setAttr -lock on ($cameraShape + ".source");
-setAttr -lock on ($cameraShape + ".footage");
-setAttr -lock on ($cameraShape + ".res_x");
-setAttr -lock on ($cameraShape + ".res_y");
-setAttr -lock on ($cameraShape + ".fstart");
-setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
-setAttr -lock on ($cameraShape + ".filmback_w");
-setAttr -lock on ($cameraShape + ".filmback_h");
-
-setAttr -lock on ($cameraShape + ".focalLength");
-setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
-setAttr -lock on ($cameraShape + ".verticalFilmAperture");
-
-setAttr -lock on ($cameraTransform + ".translateX");
-setAttr -lock on ($cameraTransform + ".translateY");
-setAttr -lock on ($cameraTransform + ".translateZ");
-setAttr -lock on ($cameraTransform + ".rotateX");
-setAttr -lock on ($cameraTransform + ".rotateY");
-setAttr -lock on ($cameraTransform + ".rotateZ");
-setAttr -lock on ($cameraTransform + ".scaleX");
-setAttr -lock on ($cameraTransform + ".scaleY");
-setAttr -lock on ($cameraTransform + ".scaleZ");
-
 
 // create image plane...
 string $imagePlane = `createNode imagePlane`;
@@ -79,7 +33,7 @@ setAttr ($imagePlane  + ".depth") (9000/2);
 // parent camera to scene group...
 parent $cameraTransform $sceneGroupName;
 
-// animating camera cam_mm_A121C001_150328_R4OY...
+// animating camera A121C001_150328_R4OY_1_1...
 playbackOptions -min 1001 -max 1245;
 
 setKeyframe -at translateX -t 1001 -v 1.978472652994061 $cameraTransform; setKeyframe -at translateY -t 1001 -v -8.079773886417307 $cameraTransform; setKeyframe -at translateZ -t 1001 -v 12.745353958857288 $cameraTransform; setKeyframe -at rotateX -t 1001 -v 15.795215258281354 $cameraTransform; setKeyframe -at rotateY -t 1001 -v -0.008103402948814 $cameraTransform; setKeyframe -at rotateZ -t 1001 -v -0.812661468968629 $cameraTransform; setKeyframe -at focalLength -t 1001 -v 14.016441952941541 $cameraShape;
@@ -328,8 +282,8 @@ setKeyframe -at translateX -t 1243 -v 2.212066661375879 $cameraTransform; setKey
 setKeyframe -at translateX -t 1244 -v 2.213004375077716 $cameraTransform; setKeyframe -at translateY -t 1244 -v 0.231690044871576 $cameraTransform; setKeyframe -at translateZ -t 1244 -v 1.478230990154572 $cameraTransform; setKeyframe -at rotateX -t 1244 -v 21.039398926044097 $cameraTransform; setKeyframe -at rotateY -t 1244 -v 2.695876013211450 $cameraTransform; setKeyframe -at rotateZ -t 1244 -v -0.478920381533414 $cameraTransform; setKeyframe -at focalLength -t 1244 -v 14.016441952941541 $cameraShape;
 setKeyframe -at translateX -t 1245 -v 2.213996897103085 $cameraTransform; setKeyframe -at translateY -t 1245 -v 0.248752233521333 $cameraTransform; setKeyframe -at translateZ -t 1245 -v 1.441216820530300 $cameraTransform; setKeyframe -at rotateX -t 1245 -v 21.079745930444517 $cameraTransform; setKeyframe -at rotateY -t 1245 -v 2.755238352474082 $cameraTransform; setKeyframe -at rotateZ -t 1245 -v -0.501257857956081 $cameraTransform; setKeyframe -at focalLength -t 1245 -v 14.016441952941541 $cameraShape;
 
-// create camera cam_mm_lens_grid_resize...
-string $cameraNodes[] = `camera -name "cam_mm_lens_grid_resize" -hfa 0.935433070866142  -vfa 0.526181102362205 -fl 14.016441952941541 -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff "overscan"`;
+// create camera lens_grid_resize_2_1...
+string $cameraNodes[] = `camera -name "lens_grid_resize_2_1" -hfa 0.935433070866142  -vfa 0.526181102362205 -fl 14.016441952941541 -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff "overscan"`;
 string $cameraTransform = $cameraNodes[0];
 string $cameraShape = $cameraNodes[1];
 xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;
@@ -338,52 +292,6 @@ setAttr ($cameraShape+".verticalFilmOffset") -0.000000000000000;
 xform -translation 0.000000000000000 0.000000000000000 0.000000000000000 $cameraTransform;
 xform -rotation -0.000000000000000 0.000000000000000 0.000000000000000 $cameraTransform;
 xform -scale 1 1 1 $cameraTransform;
-
-// add pipeline attribs
-addAttr -longName "source" -dataType "string" $cameraShape;
-addAttr -longName "footage" -dataType "string" $cameraShape;
-addAttr -longName "res_x" -attributeType "short" $cameraShape;
-addAttr -longName "res_y" -attributeType "short" $cameraShape;
-addAttr -longName "focal" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
-addAttr -longName "fstart" -attributeType short $cameraShape;
-addAttr -longName "fend" -attributeType short $cameraShape;
-
-setAttr ($cameraShape + ".source") -type "string" "/home/DForgacs/dev/3DEtools/tests/test_fixtures/JTJ_0010_v009.3de";
-setAttr ($cameraShape + ".footage") -type "string" "/jobs/fsb/shots/jtj/jtj_0010/plates/fsb_jtj_0010_plates_EL/v001/2048x1152/fsb_jtj_0010_plates_EL_v001.####.exr";
-setAttr ($cameraShape + ".res_x") 2048;
-setAttr ($cameraShape + ".res_y") 1152;
-setAttr ($cameraShape + ".focal") 1.40164419529;
-setAttr ($cameraShape + ".filmback_w") 2.376;
-setAttr ($cameraShape + ".filmback_h") 1.3365;
-setAttr ($cameraShape + ".fstart") 1001;
-setAttr ($cameraShape + ".fend") 1245;
-
-setAttr -lock on ($cameraShape + ".source");
-setAttr -lock on ($cameraShape + ".footage");
-setAttr -lock on ($cameraShape + ".res_x");
-setAttr -lock on ($cameraShape + ".res_y");
-setAttr -lock on ($cameraShape + ".fstart");
-setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
-setAttr -lock on ($cameraShape + ".filmback_w");
-setAttr -lock on ($cameraShape + ".filmback_h");
-
-setAttr -lock on ($cameraShape + ".focalLength");
-setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
-setAttr -lock on ($cameraShape + ".verticalFilmAperture");
-
-setAttr -lock on ($cameraTransform + ".translateX");
-setAttr -lock on ($cameraTransform + ".translateY");
-setAttr -lock on ($cameraTransform + ".translateZ");
-setAttr -lock on ($cameraTransform + ".rotateX");
-setAttr -lock on ($cameraTransform + ".rotateY");
-setAttr -lock on ($cameraTransform + ".rotateZ");
-setAttr -lock on ($cameraTransform + ".scaleX");
-setAttr -lock on ($cameraTransform + ".scaleY");
-setAttr -lock on ($cameraTransform + ".scaleZ");
-
 
 // create image plane...
 string $imagePlane = `createNode imagePlane`;
