@@ -18,6 +18,30 @@ xform -translation 1.978472652994061 -8.079773886417307 12.745353958857288 $came
 xform -rotation 15.795215258281354 -0.008103402948814 -0.812661468968629 $cameraTransform;
 xform -scale 1 1 1 $cameraTransform;
 
+// add pipeline attribs
+addAttr -longName "source" -dataType "string" $cameraShape;
+addAttr -longName "fstart" -attributeType short $cameraShape;
+addAttr -longName "fend" -attributeType short $cameraShape;
+addAttr -longName "focal" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+
+setAttr ($cameraShape + ".source") -type "string" "/home/DForgacs/dev/3DEtools/tests/test_fixtures/JTJ_0010_v009.3de";
+setAttr ($cameraShape + ".fstart") 1001;
+setAttr ($cameraShape + ".fend") 1245;
+setAttr ($cameraShape + ".focal") 1.40164419529;
+setAttr ($cameraShape + ".focal") 1.40164419529;
+setAttr ($cameraShape + ".filmback_w") 2.376;
+setAttr ($cameraShape + ".filmback_h") 1.3365;
+
+setAttr -lock on ($cameraShape + ".source");
+setAttr -lock on ($cameraShape + ".fstart");
+setAttr -lock on ($cameraShape + ".fend");
+setAttr -lock on ($cameraShape + ".focal");
+setAttr -lock on ($cameraShape + ".filmback_w");
+setAttr -lock on ($cameraShape + ".filmback_h");
+
+
 // create image plane...
 string $imagePlane = `createNode imagePlane`;
 cameraImagePlaneUpdate ($cameraShape, $imagePlane);
@@ -292,6 +316,30 @@ setAttr ($cameraShape+".verticalFilmOffset") -0.000000000000000;
 xform -translation 0.000000000000000 0.000000000000000 0.000000000000000 $cameraTransform;
 xform -rotation -0.000000000000000 0.000000000000000 0.000000000000000 $cameraTransform;
 xform -scale 1 1 1 $cameraTransform;
+
+// add pipeline attribs
+addAttr -longName "source" -dataType "string" $cameraShape;
+addAttr -longName "fstart" -attributeType short $cameraShape;
+addAttr -longName "fend" -attributeType short $cameraShape;
+addAttr -longName "focal" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+
+setAttr ($cameraShape + ".source") -type "string" "/home/DForgacs/dev/3DEtools/tests/test_fixtures/JTJ_0010_v009.3de";
+setAttr ($cameraShape + ".fstart") 1001;
+setAttr ($cameraShape + ".fend") 1245;
+setAttr ($cameraShape + ".focal") 1.40164419529;
+setAttr ($cameraShape + ".focal") 1.40164419529;
+setAttr ($cameraShape + ".filmback_w") 2.376;
+setAttr ($cameraShape + ".filmback_h") 1.3365;
+
+setAttr -lock on ($cameraShape + ".source");
+setAttr -lock on ($cameraShape + ".fstart");
+setAttr -lock on ($cameraShape + ".fend");
+setAttr -lock on ($cameraShape + ".focal");
+setAttr -lock on ($cameraShape + ".filmback_w");
+setAttr -lock on ($cameraShape + ".filmback_h");
+
 
 // create image plane...
 string $imagePlane = `createNode imagePlane`;
