@@ -3,12 +3,6 @@
 3DE4r5 extended
 
 github/danielforgacs
-
-features:
-	- mel file name = export/3de filename
-	- frame range comes from 3de settings
-
-todo:
 """
 #
 #
@@ -42,7 +36,7 @@ def get_mel_filename():
 
 	print('path: {0}'.format(path))
 
-	return path
+	return {'path': path, 'filename': projectname}
 
 
 def get_frame_range():
@@ -209,7 +203,7 @@ if ret==1:
 	# if yup==2: yup = 0
 	yup	= 1
 	# path	= tde4.getWidgetValue(req,"file_browser")
-	path = get_mel_filename()
+	path = get_mel_filename()['path']
 	# frame0	= float(tde4.getWidgetValue(req,"startframe_field"))
 	# frame0	-= 1
 	framerange = get_frame_range()
@@ -234,9 +228,14 @@ if ret==1:
 
 			#
 			# write scene group...
+			groupname = """// create scene group...
+string $sceneGroupName = `group -em -name "mm_{name}"`;
+"""
 
-			f.write("// create scene group...\n")
-			f.write("string $sceneGroupName = `group -em -name \"Scene\"`;\n")
+			# f.write("// create scene group...\n")
+			# f.write("string $sceneGroupName = `group -em -name \"Scene\"`;\n")
+			groupname = groupname.format(name=get_mel_filename()['filename'][:-4])
+			f.write(groupname)
 
 			#
 			# write cameras...
@@ -249,7 +248,10 @@ if ret==1:
 				lens		= tde4.getCameraLens(cam)
 				if lens!=None:
 					name		= validName(tde4.getCameraName(cam))
-					name		= "%s_%s_1"%(name,index)
+					cam_name = 'cam_mm_' + name
+					# name		= "%s_%s_1"%(name,index)
+					# name		= "%s_%s"%(name,index)
+					name = cam_name
 					index		+= 1
 					fback_w		= tde4.getLensFBackWidth(lens)
 					fback_h		= tde4.getLensFBackHeight(lens)
