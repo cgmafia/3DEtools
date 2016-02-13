@@ -1,2 +1,4 @@
 *.pyc
 tests/test_fixtures/exports/
+tests/maya/images/
+tests/maya/renderData
