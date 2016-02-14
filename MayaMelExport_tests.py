@@ -1,6 +1,7 @@
 import os
 import unittest
 from test import test_support
+import MayaMelExport
 
 
 location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,9 @@ class FileComparisonTest(unittest.TestCase):
 class MayaMelExportFuncTest(unittest.TestCase):
 	def test__are_running(self):
 		self.assertTrue(True)
+
+	def test__exporter_creates_mel_file_in_export_folder(self):
+		MayaMelExport.main()
 
 
 def test_main():
