@@ -27,12 +27,20 @@ from vl_sdv import *
 class MayaConnectWrapper(object):
 	def __enter__(self):
 		self.maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.maya.connect(('localhost', 6005))
+		try:
+			self.maya.connect(('localhost', 6005))
+		except:
+			raise Exception('--> Maya is not running. Can\'t open exported mel')
 
 		return self.maya
 
 	def __exit__(self, type, value, traceback):
 		self.maya.close()
+
+class Tde4Wrapper(object):
+	"""
+	wrapper class for the tde4 module
+	"""
 
 #
 # functions...

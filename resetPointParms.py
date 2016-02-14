@@ -7,16 +7,16 @@
 # 3DE4.script.startup:              false
 
 def reset_point_parameters():
-    group_id    = tde4.getCurrentPGroup()
-    cam         = tde4.getCurrentCamera()
-    frame       = tde4.getCurrentFrame(cam)
-    point_list  = tde4.getPointList(group_id, 1)
+    group_id = tde4.getCurrentPGroup()
+    cam = tde4.getCurrentCamera()
+    frame = tde4.getCurrentFrame(cam)
+    point_list = tde4.getPointList(group_id, 1)
 
     if len(point_list) != 1:
         tde4.postQuestionRequester("Point Error", "Please select exactly one point.", "OK")
         return
 
-    point_id    = point_list[0]
+    point_id = point_list[0]
 
     tde4.setPointTrackingMode(group_id, point_id, 'TRACKING_PATTERN')
     tde4.setPointRGBWeights(group_id, point_id, 0.5, 1, 0)
