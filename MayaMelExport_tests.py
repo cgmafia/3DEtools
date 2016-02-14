@@ -1,13 +1,21 @@
+# 3DE4.script.name: mel export tests...
+#
+# 3DE4.script.version:  v0.1
+#
+# 3DE4.script.gui:  Main Window::ford
+#
+# 3DE4.script.comment:  tests
+
 import os
 import unittest
 from test import test_support
 import MayaMelExport
 
 
-location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-if location not in os.sys.path:
-    os.sys.path.append(location)
+# if location not in os.sys.path:
+#     os.sys.path.append(location)
 
 
 
