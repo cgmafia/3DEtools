@@ -34,6 +34,11 @@ class MayaConnectWrapper(object):
 	def __exit__(self, type, value, traceback):
 		self.maya.close()
 
+class Tde4Wrapper(object):
+	"""
+	wrapper class for the tde4 module
+	"""
+
 #
 # functions...
 
