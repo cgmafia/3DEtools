@@ -56,7 +56,7 @@ def get_mel_filename():
 	if not os.path.exists(os.path.join(folder, 'exports')):
 		os.mkdir(os.path.join(folder, 'exports'))
 
-	print('path: {0}'.format(path))
+	# print('path: {0}'.format(path))
 
 	return {'path': path, 'filename': projectname}
 
@@ -65,7 +65,7 @@ def get_frame_range():
 	cam_id = tde4.getCurrentCamera()
 	fstart, fend, step = tde4.getCameraSequenceAttr(cam_id)
 
-	print('frame range@ {0} -{1}'.format(fstart, fend))
+	# print('frame range@ {0} -{1}'.format(fstart, fend))
 
 	return {'first': fstart, 'last': fend}
 
@@ -564,6 +564,6 @@ def do_maya_import(path):
 
 if __name__ == '__main__':
 	melscript = main()
-	print(melscript)
+	# print(melscript)
 	do_maya_import(melscript)
-	print('--> Done...')
+	# print('--> Done...')
