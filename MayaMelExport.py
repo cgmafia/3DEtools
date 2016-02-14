@@ -30,7 +30,7 @@ class MayaConnectWrapper(object):
 		try:
 			self.maya.connect(('localhost', 6005))
 		except:
-			raise Exception('--> Maya is not running. Can\'t open exported mel')
+			print('--> Maya is not running. Can\'t open exported mel')
 
 		return self.maya
 
@@ -56,7 +56,7 @@ def get_mel_filename():
 	if not os.path.exists(os.path.join(folder, 'exports')):
 		os.mkdir(os.path.join(folder, 'exports'))
 
-	print('path: {0}'.format(path))
+	# print('path: {0}'.format(path))
 
 	return {'path': path, 'filename': projectname}
 
@@ -65,7 +65,7 @@ def get_frame_range():
 	cam_id = tde4.getCurrentCamera()
 	fstart, fend, step = tde4.getCameraSequenceAttr(cam_id)
 
-	print('frame range@ {0} -{1}'.format(fstart, fend))
+	# print('frame range@ {0} -{1}'.format(fstart, fend))
 
 	return {'first': fstart, 'last': fend}
 
@@ -540,7 +540,8 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 				f.write("\n")
 				f.close()
-				tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
+				# tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
+				print '--> successfully exported Maya Mel'
 			else:
 				tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
@@ -548,13 +549,6 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 
 def do_maya_import(path):
-	# maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	# maya.connect(('localhost', 6005))
-
-	# maya.send('\n\nprint "{path}";'.format(path=path))
-	# maya.send('source "{path}"'.format(path=path))
-	# maya.close()
-
 	with MayaConnectWrapper() as maya:
 		maya.send('\n\nprint "{path}";'.format(path=path))
 		maya.send('source "{path}"'.format(path=path))
@@ -564,6 +558,10 @@ def do_maya_import(path):
 
 if __name__ == '__main__':
 	melscript = main()
-	print(melscript)
-	do_maya_import(melscript)
+	# print(melscript)
+	try:
+		do_maya_import(melscript)
+	except:
+		pass
+
 	print('--> Done...')
