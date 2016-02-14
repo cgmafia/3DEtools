@@ -6,7 +6,7 @@
 # 3DE4.script.hide:                 false
 # 3DE4.script.startup:              false
 
-def reverseTrackingDirection():
+def reset_point_parameters():
     group_id    = tde4.getCurrentPGroup()
     cam         = tde4.getCurrentCamera()
     frame       = tde4.getCurrentFrame(cam)
@@ -28,4 +28,4 @@ def reverseTrackingDirection():
 
 
 
-reverseTrackingDirection()
+reset_point_parameters()
