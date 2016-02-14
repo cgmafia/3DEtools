@@ -1,5 +1,7 @@
 import os
 import unittest
+from test import test_support
+
 
 location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,6 +21,13 @@ class FileComparisonTest(unittest.TestCase):
         self.assertEqual(new_export, original_export)
 
 
+class MayaMelExportFuncTest(unittest.TestCase):
+	def test__are_running(self):
+		self.assertTrue(True)
 
-if __name__ == '__main__':
-    unittest.main(module=__name__)
+
+def test_main():
+    test_support.run_unittest(MayaMelExportFuncTest)
+
+if __name__ == "__main__":
+    test_main()
