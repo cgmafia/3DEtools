@@ -8,15 +8,10 @@
 
 import os
 import unittest
+import shutil
 from test import test_support
 import MayaMelExport
-
-
-# location = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# if location not in os.sys.path:
-#     os.sys.path.append(location)
-
+import tde4
 
 
 class FileComparisonTest(unittest.TestCase):
@@ -31,11 +26,21 @@ class FileComparisonTest(unittest.TestCase):
 
 
 class MayaMelExportFuncTest(unittest.TestCase):
-	def test__are_running(self):
-		self.assertTrue(True)
+    def test__are_running(self):
+        self.assertTrue(True)
 
-	def test__exporter_creates_mel_file_in_export_folder(self):
-		MayaMelExport.main()
+    def test__exporter_creates_mel_file_in_export_folder(self):
+        projectpath = tde4.getProjectPath()
+        projectfolder = os.path.dirname(projectpath)
+        exportfolder = os.path.join(projectfolder, 'exports')
+
+        if os.path.exists(exportfolder):
+            shutil.rmtree(exportfolder)
+
+        MayaMelExport.main()
+        self.assertTrue(os.path.exists(exportfolder))
+
+
 
 
 def test_main():
