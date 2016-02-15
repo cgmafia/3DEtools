@@ -3,6 +3,10 @@
 3DE4r5 extended
 
 github/danielforgacs
+
+TODO:
+	- lock channels after keyframes
+	- set maya anim frame range
 """
 #
 #
@@ -110,11 +114,11 @@ setAttr -lock on ($cameraShape + ".res_x");
 setAttr -lock on ($cameraShape + ".res_y");
 setAttr -lock on ($cameraShape + ".fstart");
 setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
+//setAttr -lock on ($cameraShape + ".focal");
 setAttr -lock on ($cameraShape + ".filmback_w");
 setAttr -lock on ($cameraShape + ".filmback_h");
 
-setAttr -lock on ($cameraShape + ".focalLength");
+//setAttr -lock on ($cameraShape + ".focalLength");
 setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
 setAttr -lock on ($cameraShape + ".verticalFilmAperture");
 
