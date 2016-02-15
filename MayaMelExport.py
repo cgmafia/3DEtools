@@ -65,7 +65,14 @@ def get_mel_filename():
 def get_frame_range():
 	project = TDE4Wrapper()
 	# cam_id = tde4.getCurrentCamera()
-	fstart, fend, step = tde4.getCameraSequenceAttr(project.cam_id)
+	# fstart, fend, step = tde4.getCameraSequenceAttr(project.cam_id)
+	# print project.frange
+	# print project.cam_id
+	fstart, fend, step = project.frange
+	# fstart, fend, step = [1,2,3]
+	# frange = project.frange
+	# print fstart, fend, step
+	# print type(frange)
 
 	# print('frame range@ {0} -{1}'.format(fstart, fend))
 
