@@ -35,7 +35,8 @@ class FileComparisonTest(unittest.TestCase):
 
 class MayaMelExportFuncTest(unittest.TestCase):
     def setUp(self):
-        tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
+        # tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
+        tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/footage02_v001.3de')
 
         try:
             self.tde_file = tde4.getProjectPath()
@@ -84,7 +85,8 @@ class MayaMelExportFuncTest(unittest.TestCase):
         group_name = 'mm_' + self.project
         self.assertTrue(group_name in self.melscript)
 
-        tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
+        # tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
+        tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/footage02_v001.3de')
         mel_file = MayaMelExport.main()
 
         with open(mel_file, 'r') as f:
@@ -92,7 +94,8 @@ class MayaMelExportFuncTest(unittest.TestCase):
 
         self.assertTrue('mm_footage02_v001' in melscript)
 
-        tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/test_name.3de')
+        # tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/test_name.3de')
+        tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/test_name.3de')
         mel_file = MayaMelExport.main()
 
         with open(mel_file, 'r') as f:
@@ -103,8 +106,8 @@ class MayaMelExportFuncTest(unittest.TestCase):
 
 
 def test_main():
-    # test_support.run_unittest(MayaMelExportFuncTest)
-    test_support.run_unittest(FileComparisonTest)
+    test_support.run_unittest(MayaMelExportFuncTest)
+    # test_support.run_unittest(FileComparisonTest)
 
 if __name__ == "__main__":
     test_main()
