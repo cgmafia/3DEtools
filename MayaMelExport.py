@@ -3,6 +3,10 @@
 3DE4r5 extended
 
 github/danielforgacs
+
+TODO:
+	- lock channels after keyframes
+	- set maya anim frame range
 """
 #
 #
@@ -23,6 +27,8 @@ import os
 import socket
 import tde4
 from vl_sdv import *
+from TDE4Wrapper import TDE4Wrapper
+
 
 class MayaConnectWrapper(object):
 	def __enter__(self):
@@ -36,14 +42,6 @@ class MayaConnectWrapper(object):
 
 	def __exit__(self, type, value, traceback):
 		self.maya.close()
-
-class Tde4Wrapper(object):
-	"""
-	wrapper class for the tde4 module
-	"""
-
-#
-# functions...
 
 
 def get_mel_filename():
@@ -62,21 +60,19 @@ def get_mel_filename():
 
 
 def get_frame_range():
-	cam_id = tde4.getCurrentCamera()
-	fstart, fend, step = tde4.getCameraSequenceAttr(cam_id)
-
-	# print('frame range@ {0} -{1}'.format(fstart, fend))
+	project = TDE4Wrapper()
+	fstart, fend, step = project.frange
 
 	return {'first': fstart, 'last': fend}
 
 
 def get_cam_parms():
-	cam_id = tde4.getCurrentCamera()
-	focal = tde4.getCameraFocalLength(cam_id, 1)
-	resx = tde4.getCameraImageWidth(cam_id)
-	resy = tde4.getCameraImageHeight(cam_id)
+	project = TDE4Wrapper()
+	focal = tde4.getCameraFocalLength(project.cam_id, 1)
+	resx = tde4.getCameraImageWidth(project.cam_id)
+	resy = tde4.getCameraImageHeight(project.cam_id)
 
-	return {'focal': focal, 'id': cam_id, 'resx': resx, 'resy': resy}
+	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
 
 
 def get_filmback():
@@ -118,23 +114,23 @@ setAttr -lock on ($cameraShape + ".res_x");
 setAttr -lock on ($cameraShape + ".res_y");
 setAttr -lock on ($cameraShape + ".fstart");
 setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
+//setAttr -lock on ($cameraShape + ".focal");
 setAttr -lock on ($cameraShape + ".filmback_w");
 setAttr -lock on ($cameraShape + ".filmback_h");
 
-setAttr -lock on ($cameraShape + ".focalLength");
+//setAttr -lock on ($cameraShape + ".focalLength");
 setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
 setAttr -lock on ($cameraShape + ".verticalFilmAperture");
 
-setAttr -lock on ($cameraTransform + ".translateX");
-setAttr -lock on ($cameraTransform + ".translateY");
-setAttr -lock on ($cameraTransform + ".translateZ");
-setAttr -lock on ($cameraTransform + ".rotateX");
-setAttr -lock on ($cameraTransform + ".rotateY");
-setAttr -lock on ($cameraTransform + ".rotateZ");
-setAttr -lock on ($cameraTransform + ".scaleX");
-setAttr -lock on ($cameraTransform + ".scaleY");
-setAttr -lock on ($cameraTransform + ".scaleZ");
+//setAttr -lock on ($cameraTransform + ".translateX");
+//setAttr -lock on ($cameraTransform + ".translateY");
+//setAttr -lock on ($cameraTransform + ".translateZ");
+//setAttr -lock on ($cameraTransform + ".rotateX");
+//setAttr -lock on ($cameraTransform + ".rotateY");
+//setAttr -lock on ($cameraTransform + ".rotateZ");
+//setAttr -lock on ($cameraTransform + ".scaleX");
+//setAttr -lock on ($cameraTransform + ".scaleY");
+//setAttr -lock on ($cameraTransform + ".scaleZ");
 """
 
 	mel = mel.format(source=tde4.getProjectPath(),
