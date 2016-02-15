@@ -23,6 +23,7 @@ import os
 import socket
 import tde4
 from vl_sdv import *
+from TDE4Wrapper import TDE4Wrapper
 
 class MayaConnectWrapper(object):
 	def __enter__(self):
@@ -37,10 +38,10 @@ class MayaConnectWrapper(object):
 	def __exit__(self, type, value, traceback):
 		self.maya.close()
 
-class Tde4Wrapper(object):
-	"""
-	wrapper class for the tde4 module
-	"""
+# class Tde4Wrapper(object):
+# 	"""
+# 	wrapper class for the tde4 module
+# 	"""
 
 #
 # functions...
@@ -62,8 +63,9 @@ def get_mel_filename():
 
 
 def get_frame_range():
-	cam_id = tde4.getCurrentCamera()
-	fstart, fend, step = tde4.getCameraSequenceAttr(cam_id)
+	project = TDE4Wrapper()
+	# cam_id = tde4.getCurrentCamera()
+	fstart, fend, step = tde4.getCameraSequenceAttr(project.cam_id)
 
 	# print('frame range@ {0} -{1}'.format(fstart, fend))
 
