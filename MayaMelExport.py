@@ -118,15 +118,15 @@ setAttr -lock on ($cameraShape + ".focalLength");
 setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
 setAttr -lock on ($cameraShape + ".verticalFilmAperture");
 
-setAttr -lock on ($cameraTransform + ".translateX");
-setAttr -lock on ($cameraTransform + ".translateY");
-setAttr -lock on ($cameraTransform + ".translateZ");
-setAttr -lock on ($cameraTransform + ".rotateX");
-setAttr -lock on ($cameraTransform + ".rotateY");
-setAttr -lock on ($cameraTransform + ".rotateZ");
-setAttr -lock on ($cameraTransform + ".scaleX");
-setAttr -lock on ($cameraTransform + ".scaleY");
-setAttr -lock on ($cameraTransform + ".scaleZ");
+//setAttr -lock on ($cameraTransform + ".translateX");
+//setAttr -lock on ($cameraTransform + ".translateY");
+//setAttr -lock on ($cameraTransform + ".translateZ");
+//setAttr -lock on ($cameraTransform + ".rotateX");
+//setAttr -lock on ($cameraTransform + ".rotateY");
+//setAttr -lock on ($cameraTransform + ".rotateZ");
+//setAttr -lock on ($cameraTransform + ".scaleX");
+//setAttr -lock on ($cameraTransform + ".scaleY");
+//setAttr -lock on ($cameraTransform + ".scaleZ");
 """
 
 	mel = mel.format(source=tde4.getProjectPath(),
