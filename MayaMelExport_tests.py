@@ -10,19 +10,25 @@ import os
 import unittest
 import shutil
 from test import test_support
-import MayaMelExport
 import tde4
 
+import MayaMelExport
 reload(MayaMelExport)
 
 
 class FileComparisonTest(unittest.TestCase):
     def test__MayaMelExport__exports_same_mel(self):
-        with open('test_fixtures/JTJ_0010_v009.mel') as original:
-            original_export = original.read()
+        oldfile = 'c:/_store/dev/3DEtools-env/3DEtools/tests/3de/exports/footage02_v001_old.mel'
 
-        with open('test_fixtures/exports/JTJ_0010_v009.mel') as original:
-            new_export = original.read()
+        with open(oldfile, 'r') as old:
+            original_export = old.read()
+
+        newfile = MayaMelExport.main().replace('\\', '/')
+        # print oldfile
+        # print newfile
+
+        with open(newfile, 'r') as new:
+            new_export = new.read()
 
         self.assertEqual(new_export, original_export)
 
@@ -97,7 +103,8 @@ class MayaMelExportFuncTest(unittest.TestCase):
 
 
 def test_main():
-    test_support.run_unittest(MayaMelExportFuncTest)
+    # test_support.run_unittest(MayaMelExportFuncTest)
+    test_support.run_unittest(FileComparisonTest)
 
 if __name__ == "__main__":
     test_main()
