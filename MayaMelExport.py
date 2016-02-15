@@ -97,6 +97,7 @@ addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
 addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
 addAttr -longName "fstart" -attributeType short $cameraShape;
 addAttr -longName "fend" -attributeType short $cameraShape;
+addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
 
 setAttr ($cameraShape + ".source") -type "string" "{source}";
 setAttr ($cameraShape + ".footage") -type "string" "{footage}";
@@ -107,6 +108,7 @@ setAttr ($cameraShape + ".filmback_w") {filmback_w};
 setAttr ($cameraShape + ".filmback_h") {filmback_h};
 setAttr ($cameraShape + ".fstart") {fstart};
 setAttr ($cameraShape + ".fend") {fend};
+setAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipparms}";
 
 setAttr -lock on ($cameraShape + ".source");
 setAttr -lock on ($cameraShape + ".footage");
@@ -114,9 +116,10 @@ setAttr -lock on ($cameraShape + ".res_x");
 setAttr -lock on ($cameraShape + ".res_y");
 setAttr -lock on ($cameraShape + ".fstart");
 setAttr -lock on ($cameraShape + ".fend");
-//setAttr -lock on ($cameraShape + ".focal");
+setAttr -lock on ($cameraShape + ".focal");
 setAttr -lock on ($cameraShape + ".filmback_w");
 setAttr -lock on ($cameraShape + ".filmback_h");
+setAttr -lock on ($cameraShape + ".pipelineparmsdict");
 
 //setAttr -lock on ($cameraShape + ".focalLength");
 setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
@@ -133,6 +136,8 @@ setAttr -lock on ($cameraShape + ".verticalFilmAperture");
 //setAttr -lock on ($cameraTransform + ".scaleZ");
 """
 
+	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
+
 	mel = mel.format(source=tde4.getProjectPath(),
 					footage=tde4.getCameraPath(get_cam_parms()['id']),
 					res_x=get_cam_parms()['resx'],
@@ -142,6 +147,7 @@ setAttr -lock on ($cameraShape + ".verticalFilmAperture");
 					filmback_h=get_filmback()['h'],
 					fstart=get_frame_range()['first'],
 					fend=get_frame_range()['last'],
+					pipparms=pipelineparms,
 				)
 
 	return mel
