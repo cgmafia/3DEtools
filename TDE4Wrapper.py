@@ -24,16 +24,15 @@ from vl_sdv import *
 class TDE4Wrapper(object):
     linker = {
             'cam_id': ('getCurrentCamera',),
-            'frange': ('getCameraSequenceAttr', 'cam_id')
+            'frange': ('getCameraSequenceAttr', 'cam_id'),
+            'res_x': ('getCameraImageWidth', 'cam_id'),
+            'res_y': ('getCameraImageHeight', 'cam_id'),
         }
 
     def __getattr__(self, attr):
         if len(self.linker[attr]) == 1:
             return getattr(tde4, self.linker[attr][0])()
         else:
-            # return getattr(tde4, self.linker[attr][0])(self.cam_id)
-            # return getattr(tde4, self.linker[attr][0])(self.linker[attr][1])
-            # print self.linker[attr]
             return getattr(tde4, self.linker[attr][0])(self.cam_id)
 
 
@@ -41,14 +40,8 @@ class TDE4Wrapper(object):
 
 def main():
     k = TDE4Wrapper()
-    # print k.getCurrentCamera()
-    # # print TDE4Wrapper.__dict__
-    # # print tde4.getCameraSequenceAttr(k.cam_id)
-    # print getattr(tde4, 'getCameraSequenceAttr')(k.cam_id)
-    # print k.cam_id
     print k.frange
     print type(k.frange)
-    # print k.frange[0], k.frange[1], k.frange[2]
 
 
 if __name__ == '__main__':

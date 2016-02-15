@@ -25,6 +25,7 @@ import tde4
 from vl_sdv import *
 from TDE4Wrapper import TDE4Wrapper
 
+
 class MayaConnectWrapper(object):
 	def __enter__(self):
 		self.maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,14 +38,6 @@ class MayaConnectWrapper(object):
 
 	def __exit__(self, type, value, traceback):
 		self.maya.close()
-
-# class Tde4Wrapper(object):
-# 	"""
-# 	wrapper class for the tde4 module
-# 	"""
-
-#
-# functions...
 
 
 def get_mel_filename():
@@ -64,28 +57,18 @@ def get_mel_filename():
 
 def get_frame_range():
 	project = TDE4Wrapper()
-	# cam_id = tde4.getCurrentCamera()
-	# fstart, fend, step = tde4.getCameraSequenceAttr(project.cam_id)
-	# print project.frange
-	# print project.cam_id
 	fstart, fend, step = project.frange
-	# fstart, fend, step = [1,2,3]
-	# frange = project.frange
-	# print fstart, fend, step
-	# print type(frange)
-
-	# print('frame range@ {0} -{1}'.format(fstart, fend))
 
 	return {'first': fstart, 'last': fend}
 
 
 def get_cam_parms():
-	cam_id = tde4.getCurrentCamera()
-	focal = tde4.getCameraFocalLength(cam_id, 1)
-	resx = tde4.getCameraImageWidth(cam_id)
-	resy = tde4.getCameraImageHeight(cam_id)
+	project = TDE4Wrapper()
+	focal = tde4.getCameraFocalLength(project.cam_id, 1)
+	resx = tde4.getCameraImageWidth(project.cam_id)
+	resy = tde4.getCameraImageHeight(project.cam_id)
 
-	return {'focal': focal, 'id': cam_id, 'resx': resx, 'resy': resy}
+	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
 
 
 def get_filmback():
