@@ -35,8 +35,8 @@ class FileComparisonTest(unittest.TestCase):
 
 class MayaMelExportFuncTest(unittest.TestCase):
     def setUp(self):
-        # tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
-        tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/footage02_v001.3de')
+        tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/footage02_v001.3de')
+        # tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/footage02_v001.3de')
 
         try:
             self.tde_file = tde4.getProjectPath()
@@ -94,14 +94,23 @@ class MayaMelExportFuncTest(unittest.TestCase):
 
         self.assertTrue('mm_footage02_v001' in melscript)
 
-        # tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/test_name.3de')
-        tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/test_name.3de')
+        tde4.loadProject('c:/_store/dev/3DEtools-env/3DEtools/tests/3de/test_name.3de')
+        # tde4.loadProject('/home/DForgacs/dev/3DEtools/tests/3de/test_name.3de')
         mel_file = MayaMelExport.main()
 
         with open(mel_file, 'r') as f:
             melscript = f.read()
 
         self.assertTrue('mm_test_name' in melscript)
+
+    def test__mel_filepath_is_3de_path_plus_export(self):
+        project = tde4.getProjectPath()
+
+        paths = MayaMelExport.get_mel_filename()
+        print project
+        print paths
+
+        # self.assertEqual()
 
 
 
