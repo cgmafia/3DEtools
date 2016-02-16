@@ -10,11 +10,11 @@ TODO:
 """
 #
 #
-# 3DE4.script.name:	mel export...
+# 3DE4.script.name:	Auto Mel Export
 #
 # 3DE4.script.version:	v0.1
 #
-# 3DE4.script.gui:	Main Window::ford
+# 3DE4.script.gui:	Main Window::Azure
 #
 # 3DE4.script.comment:	Creates a MEL script file that contains all project data, which can be imported into Autodesk Maya.
 #
@@ -83,6 +83,41 @@ def get_filmback():
 
 	return {'w': filmback_w, 'h': filmback_h}
 
+
+def add_pipeline_parms():
+	"""
+	new function to add pipeline attributes
+	on the camerashpe node as custom attributes.
+
+	attributes comes user readable, but a dictionary
+	contains all in a dictionary as a json dump
+	for other tool devs
+
+	parm setup is separated from parms lock
+	to avoid trying to key locked attributes
+
+	- parmtypes as class?!
+	"""
+	project = TDE4Wrapper()
+	parmtypes = {
+			's': 'string',
+			'i': 'short',
+			'f': 'float'
+	}
+	parms = {
+			'source3De': (parmtypes['s'], project.path),
+			'footage': (parmtypes['s'], project.footage),
+	}
+
+	melsetup = ''
+	mellock = ''
+
+	for parm in parms:
+		pass
+
+	mel = {'parmsetup': melsetup, 'parmslock': mellock}
+
+	return mel
 
 
 def add_pipeline_attribs():
