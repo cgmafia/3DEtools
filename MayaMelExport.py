@@ -10,11 +10,11 @@ TODO:
 """
 #
 #
-# 3DE4.script.name:	mel export...
+# 3DE4.script.name:	Auto Mel Export
 #
 # 3DE4.script.version:	v0.1
 #
-# 3DE4.script.gui:	Main Window::ford
+# 3DE4.script.gui:	Main Window::Azure
 #
 # 3DE4.script.comment:	Creates a MEL script file that contains all project data, which can be imported into Autodesk Maya.
 #
