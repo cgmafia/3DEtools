@@ -93,6 +93,9 @@ def add_pipeline_parms():
 	contains all in a dictionary as a json dump
 	for other tool devs
 
+	parm setup is separated from parms lock
+	to avoid trying to key locked attributes
+
 	- parmtypes as class?!
 	"""
 	project = TDE4Wrapper()
@@ -102,8 +105,19 @@ def add_pipeline_parms():
 			'f': 'float'
 	}
 	parms = {
-			'source3De': (parmtypes['s'], project.path)
+			'source3De': (parmtypes['s'], project.path),
+			'footage': (parmtypes['s'], project.footage),
 	}
+
+	melsetup = ''
+	mellock = ''
+
+	for parm in parms:
+		pass
+
+	mel = {'parmsetup': melsetup, 'parmslock': mellock}
+
+	return mel
 
 
 def add_pipeline_attribs():
