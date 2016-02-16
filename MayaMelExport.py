@@ -84,6 +84,27 @@ def get_filmback():
 	return {'w': filmback_w, 'h': filmback_h}
 
 
+def add_pipeline_parms():
+	"""
+	new function to add pipeline attributes
+	on the camerashpe node as custom attributes.
+
+	attributes comes user readable, but a dictionary
+	contains all in a dictionary as a json dump
+	for other tool devs
+
+	- parmtypes as class?!
+	"""
+	project = TDE4Wrapper()
+	parmtypes = {
+			's': 'string',
+			'i': 'short',
+			'f': 'float'
+	}
+	parms = {
+			'source3De': (parmtypes['s'], project.path)
+	}
+
 
 def add_pipeline_attribs():
 	mel = """
