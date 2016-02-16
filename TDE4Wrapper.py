@@ -27,6 +27,7 @@ class TDE4Wrapper(object):
             'frange': ('getCameraSequenceAttr', 'cam_id'),
             'res_x': ('getCameraImageWidth', 'cam_id'),
             'res_y': ('getCameraImageHeight', 'cam_id'),
+            'path': ('getProjectPath')
         }
 
     def __getattr__(self, attr):
