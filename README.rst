@@ -7,5 +7,4 @@ todo:
 	- set timeline
 	- export delense node with mel
 	- extra attributes as dictionary
-	- overscan setter
-	- mm toolbar check
+    - mm toolbar check
