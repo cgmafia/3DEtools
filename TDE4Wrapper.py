@@ -3,20 +3,6 @@ wrapper class for 3DEqualizer tde4 API.
 
 github/danielforgacs
 """
-#
-#
-# 3DE4.script.name: tde wrapper
-#
-# 3DE4.script.version:  v0.1
-#
-# 3DE4.script.gui:  Main Window::ford
-#
-# 3DE4.script.comment: sjkghdfjksegf
-#
-#
-
-#
-# import sdv's python vector lib...
 
 import tde4
 from vl_sdv import *
