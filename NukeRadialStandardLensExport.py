@@ -207,61 +207,69 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 
 
 # main
-try:
-	camlist = tde4.getCameraList(1)
-	if not camlist:
-		raise Exception('     Only selected cameras will be exported     ')
+def main(melscript):
+	"""
+	melscript: melscript full path to save nuke node next to id
+	"""
 
-	for cam in camlist:
-		offset 	= (tde4.getCameraSequenceAttr(cam)[0])-1
-		lens 	= tde4.getCameraLens(cam)
+	try:
+		camlist = tde4.getCameraList(1)
+		if not camlist:
+			raise Exception('     Only selected cameras will be exported     ')
 
-# check if variable 'nuke_path' exists already or is of type None
-		try:
-			nuke_path
-		except:
-			nuke_path = ''
+		for cam in camlist:
+			offset 	= (tde4.getCameraSequenceAttr(cam)[0])-1
+			lens 	= tde4.getCameraLens(cam)
 
-		if nuke_path is None:
-			nuke_path = ''
+	# check if variable 'nuke_path' exists already or is of type None
+			try:
+				nuke_path
+			except:
+				nuke_path = ''
+
+			if nuke_path is None:
+				nuke_path = ''
 
 
-# open requester
-		nuke_node_req	= tde4.createCustomRequester()
-		tde4.addFileWidget(nuke_node_req, 'userInput', 'Filename: ', '*.nk', nuke_path)
+	# open requester
+			# nuke_node_req	= tde4.createCustomRequester()
+			# tde4.addFileWidget(nuke_node_req, 'userInput', 'Filename: ', '*.nk', nuke_path)
 
-		if tde4.getCameraZoomingFlag(cam) and offset != 0:
-			tde4.addToggleWidget(nuke_node_req, "stfr_menu", ("Offset curves to frame " + str(offset+1)+": "), 1)
+			# if tde4.getCameraZoomingFlag(cam) and offset != 0:
+			# 	tde4.addToggleWidget(nuke_node_req, "stfr_menu", ("Offset curves to frame " + str(offset+1)+": "), 1)
 
-		ret	= tde4.postCustomRequester(nuke_node_req,'  Export nuke distortion node for camera  '+tde4.getCameraName(cam)+' ',700,110,'  Ok  ',' Cancel ')
-		if ret != 1:
-			raise CancelException('Cancelled')
-		nuke_path = tde4.getWidgetValue(nuke_node_req, 'userInput')
+			# ret	= tde4.postCustomRequester(nuke_node_req,'  Export nuke distortion node for camera  '+tde4.getCameraName(cam)+' ',700,110,'  Ok  ',' Cancel ')
+			# if ret != 1:
+			# 	raise CancelException('Cancelled')
+			# nuke_path = tde4.getWidgetValue(nuke_node_req, 'userInput')
 
-# check path and suffix
-		if not nuke_path:
-			raise Exception('     No path entered     ')
+			nuke_path = melscript.replace('mel', 'nk')
 
-		if not nuke_path.endswith('.nk'):
-			nuke_path	= nuke_path+'.nk'
+	# check path and suffix
+			if not nuke_path:
+				raise Exception('     No path entered     ')
 
-# check if offset should be applied or not if there is one
-		if tde4.getCameraZoomingFlag(cam) and offset != 0:
-			n	= tde4.getWidgetValue(nuke_node_req,"stfr_menu")
-			if n != 1:
-				offset = 0
+			if not nuke_path.endswith('.nk'):
+				nuke_path	= nuke_path+'.nk'
 
-# export
-		if ret == 1:
+	# check if offset should be applied or not if there is one
+			if tde4.getCameraZoomingFlag(cam) and offset != 0:
+				n	= tde4.getWidgetValue(nuke_node_req,"stfr_menu")
+				if n != 1:
+					offset = 0
+
+	# export
+			# if ret == 1:
 			print '------------------ Export tde4 Nuke Distortion Node ------------------'
 			exportNukeDewarpNode(cam, offset, nuke_path)
 			print 'file:',nuke_path, '\n'
 
 
-except CancelException, e:
-	print e
+	except CancelException, e:
+		print e
 
-except Exception, e:
-	print e
-	tde4.postQuestionRequester('Error ', str(e), '  OK  ')
+	except Exception, e:
+		print e
+		tde4.postQuestionRequester('Error ', str(e), '  OK  ')
 
+	return nuke_path
