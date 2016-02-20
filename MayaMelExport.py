@@ -50,6 +50,7 @@ def get_mel_filename():
 	projectname = os.path.basename(projectpath)
 	mel_name = projectname.replace('3de', 'mel')
 	path = os.path.join(folder, 'exports', mel_name)
+	path = path.replace('\\', '/')
 
 	if not os.path.exists(os.path.join(folder, 'exports')):
 		os.mkdir(os.path.join(folder, 'exports'))
@@ -595,7 +596,8 @@ def do_maya_import(path):
 
 if __name__ == '__main__':
 	melscript = main()
-	# print(melscript)
+	print(melscript)
+
 	try:
 		do_maya_import(melscript)
 	except:
