@@ -28,6 +28,8 @@ import socket
 import tde4
 from vl_sdv import *
 from TDE4Wrapper import TDE4Wrapper
+import NukeRadialStandardLensExport
+reload(NukeRadialStandardLensExport)
 
 
 class MayaConnectWrapper(object):
@@ -596,7 +598,10 @@ def do_maya_import(path):
 
 if __name__ == '__main__':
 	melscript = main()
-	print(melscript)
+	print('--> melscript: ', melscript)
+
+	delens_node = NukeRadialStandardLensExport.main(melscript)
+	print('--> delens_node: ', delens_node)
 
 	try:
 		do_maya_import(melscript)
