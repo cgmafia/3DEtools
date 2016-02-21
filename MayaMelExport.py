@@ -75,22 +75,22 @@ def get_frame_range():
 	return {'first': fstart, 'last': fend}
 
 
-def get_cam_parms():
-	project = TDE4Wrapper.TDE4Wrapper()
-	focal = tde4.getCameraFocalLength(project.cam_id, 1)
-	resx = tde4.getCameraImageWidth(project.cam_id)
-	resy = tde4.getCameraImageHeight(project.cam_id)
+# def get_cam_parms():
+# 	project = TDE4Wrapper.TDE4Wrapper()
+# 	focal = tde4.getCameraFocalLength(project.cam_id, 1)
+# 	resx = tde4.getCameraImageWidth(project.cam_id)
+# 	resy = tde4.getCameraImageHeight(project.cam_id)
 
-	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
+# 	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
 
 
-def get_filmback():
-	cam_id = tde4.getCurrentCamera()
-	lens_id = tde4.getCameraLens(cam_id)
-	filmback_w = tde4.getLensFBackWidth(lens_id)
-	filmback_h = tde4.getLensFBackHeight(lens_id)
+# def get_filmback():
+# 	cam_id = tde4.getCurrentCamera()
+# 	lens_id = tde4.getCameraLens(cam_id)
+# 	filmback_w = tde4.getLensFBackWidth(lens_id)
+# 	filmback_h = tde4.getLensFBackHeight(lens_id)
 
-	return {'w': filmback_w, 'h': filmback_h}
+# 	return {'w': filmback_w, 'h': filmback_h}
 
 
 def add_pipeline_parms():
@@ -155,63 +155,63 @@ def add_pipeline_parms():
 	return mel
 
 
-def add_pipeline_attribs_OBSOLETE():
-	print add_pipeline_parms()
-	mel = """
-// add pipeline attribs
--------addAttr -longName "source" -dataType "string" $cameraShape;
--------addAttr -longName "footage" -dataType "string" $cameraShape;
--------addAttr -longName "res_x" -attributeType "short" $cameraShape;
--------addAttr -longName "res_y" -attributeType "short" $cameraShape;
--------addAttr -longName "focal" -attributeType "float" $cameraShape;
--------addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
--------addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
-addAttr -longName "fstart" -attributeType short $cameraShape;
-addAttr -longName "fend" -attributeType short $cameraShape;
--------addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
+# def add_pipeline_attribs_OBSOLETE():
+# 	print add_pipeline_parms()
+# 	mel = """
+# // add pipeline attribs
+# -------addAttr -longName "source" -dataType "string" $cameraShape;
+# -------addAttr -longName "footage" -dataType "string" $cameraShape;
+# -------addAttr -longName "res_x" -attributeType "short" $cameraShape;
+# -------addAttr -longName "res_y" -attributeType "short" $cameraShape;
+# -------addAttr -longName "focal" -attributeType "float" $cameraShape;
+# -------addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+# -------addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+# -------addAttr -longName "fstart" -attributeType short $cameraShape;
+# -------addAttr -longName "fend" -attributeType short $cameraShape;
+# -------addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
 
-setAttr ($cameraShape + ".source") -type "string" "{source}";
-setAttr ($cameraShape + ".footage") -type "string" "{footage}";
-setAttr ($cameraShape + ".res_x") {res_x};
-setAttr ($cameraShape + ".res_y") {res_y};
-setAttr ($cameraShape + ".focal") {focal};
-setAttr ($cameraShape + ".filmback_w") {filmback_w};
-setAttr ($cameraShape + ".filmback_h") {filmback_h};
-setAttr ($cameraShape + ".fstart") {fstart};
-setAttr ($cameraShape + ".fend") {fend};
-setAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipparms}";
+# setAttr ($cameraShape + ".source") -type "string" "{source}";
+# setAttr ($cameraShape + ".footage") -type "string" "{footage}";
+# setAttr ($cameraShape + ".res_x") {res_x};
+# setAttr ($cameraShape + ".res_y") {res_y};
+# setAttr ($cameraShape + ".focal") {focal};
+# setAttr ($cameraShape + ".filmback_w") {filmback_w};
+# setAttr ($cameraShape + ".filmback_h") {filmback_h};
+# setAttr ($cameraShape + ".fstart") {fstart};
+# setAttr ($cameraShape + ".fend") {fend};
+# setAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipparms}";
 
-setAttr -lock on ($cameraShape + ".source");
-setAttr -lock on ($cameraShape + ".footage");
-setAttr -lock on ($cameraShape + ".res_x");
-setAttr -lock on ($cameraShape + ".res_y");
-setAttr -lock on ($cameraShape + ".fstart");
-setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
-setAttr -lock on ($cameraShape + ".filmback_w");
-setAttr -lock on ($cameraShape + ".filmback_h");
-setAttr -lock on ($cameraShape + ".pipelineparmsdict");
+# setAttr -lock on ($cameraShape + ".source");
+# setAttr -lock on ($cameraShape + ".footage");
+# setAttr -lock on ($cameraShape + ".res_x");
+# setAttr -lock on ($cameraShape + ".res_y");
+# setAttr -lock on ($cameraShape + ".fstart");
+# setAttr -lock on ($cameraShape + ".fend");
+# setAttr -lock on ($cameraShape + ".focal");
+# setAttr -lock on ($cameraShape + ".filmback_w");
+# setAttr -lock on ($cameraShape + ".filmback_h");
+# setAttr -lock on ($cameraShape + ".pipelineparmsdict");
 
-setAttr -lock on ($cameraShape + ".focalLength");
-setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
-setAttr -lock on ($cameraShape + ".verticalFilmAperture");
-"""
+# setAttr -lock on ($cameraShape + ".focalLength");
+# setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
+# setAttr -lock on ($cameraShape + ".verticalFilmAperture");
+# """
 
-	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
+# 	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
 
-	mel = mel.format(source=tde4.getProjectPath(),
-					footage=tde4.getCameraPath(get_cam_parms()['id']),
-					res_x=get_cam_parms()['resx'],
-					res_y=get_cam_parms()['resy'],
-					focal=get_cam_parms()['focal'],
-					filmback_w=get_filmback()['w'],
-					filmback_h=get_filmback()['h'],
-					fstart=get_frame_range()['first'],
-					fend=get_frame_range()['last'],
-					pipparms=pipelineparms,
-				)
+# 	mel = mel.format(source=tde4.getProjectPath(),
+# 					footage=tde4.getCameraPath(get_cam_parms()['id']),
+# 					res_x=get_cam_parms()['resx'],
+# 					res_y=get_cam_parms()['resy'],
+# 					focal=get_cam_parms()['focal'],
+# 					filmback_w=get_filmback()['w'],
+# 					filmback_h=get_filmback()['h'],
+# 					fstart=get_frame_range()['first'],
+# 					fend=get_frame_range()['last'],
+# 					pipparms=pipelineparms,
+# 				)
 
-	return mel
+# 	return mel
 
 
 def convertToAngles(r3d):
