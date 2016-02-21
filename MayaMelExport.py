@@ -24,12 +24,19 @@ TODO:
 # import sdv's python vector lib...
 
 import os
+# import pickle
+import json
 import socket
 import tde4
 from vl_sdv import *
-from TDE4Wrapper import TDE4Wrapper
+# from TDE4Wrapper import TDE4Wrapper
+import TDE4Wrapper
 import NukeRadialStandardLensExport
+reload(TDE4Wrapper)
 reload(NukeRadialStandardLensExport)
+
+
+DEBUG = os.environ.get('DEBUG', False)
 
 
 class MayaConnectWrapper(object):
@@ -63,28 +70,63 @@ def get_mel_filename():
 
 
 def get_frame_range():
-	project = TDE4Wrapper()
+	project = TDE4Wrapper.TDE4Wrapper()
 	fstart, fend, step = project.frange
 
 	return {'first': fstart, 'last': fend}
 
 
-def get_cam_parms():
-	project = TDE4Wrapper()
-	focal = tde4.getCameraFocalLength(project.cam_id, 1)
-	resx = tde4.getCameraImageWidth(project.cam_id)
-	resy = tde4.getCameraImageHeight(project.cam_id)
+# def get_cam_parms():
+# 	project = TDE4Wrapper.TDE4Wrapper()
+# 	focal = tde4.getCameraFocalLength(project.cam_id, 1)
+# 	resx = tde4.getCameraImageWidth(project.cam_id)
+# 	resy = tde4.getCameraImageHeight(project.cam_id)
 
-	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
+# 	return {'focal': focal, 'id': project.cam_id, 'resx': resx, 'resy': resy}
 
 
-def get_filmback():
-	cam_id = tde4.getCurrentCamera()
-	lens_id = tde4.getCameraLens(cam_id)
-	filmback_w = tde4.getLensFBackWidth(lens_id)
-	filmback_h = tde4.getLensFBackHeight(lens_id)
+# def get_filmback():
+# 	cam_id = tde4.getCurrentCamera()
+# 	lens_id = tde4.getCameraLens(cam_id)
+# 	filmback_w = tde4.getLensFBackWidth(lens_id)
+# 	filmback_h = tde4.getLensFBackHeight(lens_id)
 
-	return {'w': filmback_w, 'h': filmback_h}
+# 	return {'w': filmback_w, 'h': filmback_h}
+
+def setup_maya_scene(mel, parms):
+	scene = ('\n\n// // --> Maya Scene SetUp:\n'
+			'\nsetAttr "defaultResolution.width" {defaultresx};'
+			'\nsetAttr "defaultResolution.height" {defaultresy};'
+			# '\nrangeControl -minRange {fstart} -maxRange {fend};'
+			'\nplaybackOptions -minTime {fstart} -animationStartTime {fstart} -maxTime {fend} -animationEndTime {fend};'
+			'\nsetAttr "defaultRenderGlobals.startFrame" {fstart};'
+			'\nsetAttr "defaultRenderGlobals.endFrame" {fend};'
+			'\nsetAttr "perspShape.renderable" 0;'
+			'\nsetAttr "defaultRenderGlobals.imageFormat" 32; // png'
+			'\n\n///////////////////////////////////////////////'
+			)
+
+	scene = scene.format(defaultresx=parms['res_x']['value'],
+					defaultresy=parms['res_y']['value'],
+					fstart=parms['fstart']['value'],
+					fend=parms['fend']['value'],
+					)
+
+	return mel + scene
+
+def add_parms_as_json_dict(mel, parms):
+	parms_as_dict = {}
+
+	for parm in parms:
+		parms_as_dict[parm] = parms[parm]['value']
+
+	mel += ('\n\n\naddAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;'
+			'\nsetAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipeparmsdict}";'
+			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");')
+
+	mel = mel.format(pipeparmsdict=json.dumps(parms_as_dict).replace('"', '\\"'))
+
+	return mel
 
 
 def add_pipeline_parms():
@@ -98,97 +140,134 @@ def add_pipeline_parms():
 
 	parm setup is separated from parms lock
 	to avoid trying to key locked attributes
-
-	- parmtypes as class?!
 	"""
-	project = TDE4Wrapper()
+
+	project = TDE4Wrapper.TDE4Wrapper()
+	project.focal
 	parmtypes = {
 			's': 'string',
 			'i': 'short',
 			'f': 'float'
 	}
+
 	parms = {
-			'source3De': (parmtypes['s'], project.path),
-			'footage': (parmtypes['s'], project.footage),
+			'source3De': {'type': parmtypes['s'], 'value': project.path.replace('\\', '\\\\')},
+			'footage': {'type': parmtypes['s'], 'value': project.footage.replace('\\', '\\\\')},
+			'res_x': {'type': parmtypes['i'], 'value': project.res_x},
+			'res_y': {'type': parmtypes['i'], 'value': project.res_y},
+			'focal': {'type': parmtypes['f'], 'value': project.focal},
+			'filmback_h': {'type': parmtypes['f'], 'value': project.filmback_h * 10},
+			'filmback_v': {'type': parmtypes['f'], 'value': project.filmback_v * 10},
+			'fstart': {'type': parmtypes['i'], 'value': project.frange[0]},
+			'fend': {'type': parmtypes['i'], 'value': project.frange[1]},
 	}
 
-	melsetup = ''
-	mellock = ''
+	mel = '\n\n// // --> Pipeline Parms Custom Attributes:'
 
+	###
+	###
+	###
+	# for parm in parms:
+	# 	if parms[parm]['type'] == 'string':
+	# 		parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+	# 				'\nsetAttr ($cameraShape + ".{name}") -type "{type}" "{source}";'
+	# 				'\nsetAttr -lock on ($cameraShape + ".{name}");')
+	# 	else:
+	# 		parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+	# 				'\nsetAttr ($cameraShape + ".{name}") {source};'
+	# 				'\nsetAttr -lock on ($cameraShape + ".{name}");')
+
+	# 	vartype = 'dataType' if parms[parm]['type'] == 'string' else 'attributeType'
+	# 	mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['value'])
+
+	###############################
 	for parm in parms:
-		pass
+		if parms[parm]['type'] == 'string':
+			attrtype = '-dataType "string"'
+			settype = '-type "string"'
+			value = '"{0}"'.format(parms[parm]['value'])
 
-	mel = {'parmsetup': melsetup, 'parmslock': mellock}
+		else:
+			attrtype = '-attributeType "{typename}"'.format(typename=parms[parm]['type'])
+			settype = ''
+			value = '{0}'.format(parms[parm]['value'])
 
-	return mel
+		parm_mel = ('\n\naddAttr -longName "{name}" {attrtype} $cameraShape;'
+				'\nsetAttr ($cameraShape + ".{name}") {settype} {value};'
+				'\nsetAttr -lock on ($cameraShape + ".{name}");')
 
+		mel += parm_mel.format(name=parm,
+								attrtype=attrtype,
+								settype=settype,
+								value=value,
+								)
+	###
+	###
+	###
 
-def add_pipeline_attribs():
-	mel = """
-// add pipeline attribs
-addAttr -longName "source" -dataType "string" $cameraShape;
-addAttr -longName "footage" -dataType "string" $cameraShape;
-addAttr -longName "res_x" -attributeType "short" $cameraShape;
-addAttr -longName "res_y" -attributeType "short" $cameraShape;
-addAttr -longName "focal" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
-addAttr -longName "fstart" -attributeType short $cameraShape;
-addAttr -longName "fend" -attributeType short $cameraShape;
-addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
-
-setAttr ($cameraShape + ".source") -type "string" "{source}";
-setAttr ($cameraShape + ".footage") -type "string" "{footage}";
-setAttr ($cameraShape + ".res_x") {res_x};
-setAttr ($cameraShape + ".res_y") {res_y};
-setAttr ($cameraShape + ".focal") {focal};
-setAttr ($cameraShape + ".filmback_w") {filmback_w};
-setAttr ($cameraShape + ".filmback_h") {filmback_h};
-setAttr ($cameraShape + ".fstart") {fstart};
-setAttr ($cameraShape + ".fend") {fend};
-setAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipparms}";
-
-setAttr -lock on ($cameraShape + ".source");
-setAttr -lock on ($cameraShape + ".footage");
-setAttr -lock on ($cameraShape + ".res_x");
-setAttr -lock on ($cameraShape + ".res_y");
-setAttr -lock on ($cameraShape + ".fstart");
-setAttr -lock on ($cameraShape + ".fend");
-setAttr -lock on ($cameraShape + ".focal");
-setAttr -lock on ($cameraShape + ".filmback_w");
-setAttr -lock on ($cameraShape + ".filmback_h");
-setAttr -lock on ($cameraShape + ".pipelineparmsdict");
-
-//setAttr -lock on ($cameraShape + ".focalLength");
-setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
-setAttr -lock on ($cameraShape + ".verticalFilmAperture");
-
-//setAttr -lock on ($cameraTransform + ".translateX");
-//setAttr -lock on ($cameraTransform + ".translateY");
-//setAttr -lock on ($cameraTransform + ".translateZ");
-//setAttr -lock on ($cameraTransform + ".rotateX");
-//setAttr -lock on ($cameraTransform + ".rotateY");
-//setAttr -lock on ($cameraTransform + ".rotateZ");
-//setAttr -lock on ($cameraTransform + ".scaleX");
-//setAttr -lock on ($cameraTransform + ".scaleY");
-//setAttr -lock on ($cameraTransform + ".scaleZ");
-"""
-
-	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
-
-	mel = mel.format(source=tde4.getProjectPath(),
-					footage=tde4.getCameraPath(get_cam_parms()['id']),
-					res_x=get_cam_parms()['resx'],
-					res_y=get_cam_parms()['resy'],
-					focal=get_cam_parms()['focal'],
-					filmback_w=get_filmback()['w'],
-					filmback_h=get_filmback()['h'],
-					fstart=get_frame_range()['first'],
-					fend=get_frame_range()['last'],
-					pipparms=pipelineparms,
-				)
+	mel = add_parms_as_json_dict(mel, parms)
+	mel = setup_maya_scene(mel, parms)
 
 	return mel
+
+
+# def add_pipeline_attribs_OBSOLETE():
+# 	print add_pipeline_parms()
+# 	mel = """
+# // add pipeline attribs
+# -------addAttr -longName "source" -dataType "string" $cameraShape;
+# -------addAttr -longName "footage" -dataType "string" $cameraShape;
+# -------addAttr -longName "res_x" -attributeType "short" $cameraShape;
+# -------addAttr -longName "res_y" -attributeType "short" $cameraShape;
+# -------addAttr -longName "focal" -attributeType "float" $cameraShape;
+# -------addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+# -------addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+# -------addAttr -longName "fstart" -attributeType short $cameraShape;
+# -------addAttr -longName "fend" -attributeType short $cameraShape;
+# -------addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
+
+# setAttr ($cameraShape + ".source") -type "string" "{source}";
+# setAttr ($cameraShape + ".footage") -type "string" "{footage}";
+# setAttr ($cameraShape + ".res_x") {res_x};
+# setAttr ($cameraShape + ".res_y") {res_y};
+# setAttr ($cameraShape + ".focal") {focal};
+# setAttr ($cameraShape + ".filmback_w") {filmback_w};
+# setAttr ($cameraShape + ".filmback_h") {filmback_h};
+# setAttr ($cameraShape + ".fstart") {fstart};
+# setAttr ($cameraShape + ".fend") {fend};
+# setAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipparms}";
+
+# setAttr -lock on ($cameraShape + ".source");
+# setAttr -lock on ($cameraShape + ".footage");
+# setAttr -lock on ($cameraShape + ".res_x");
+# setAttr -lock on ($cameraShape + ".res_y");
+# setAttr -lock on ($cameraShape + ".fstart");
+# setAttr -lock on ($cameraShape + ".fend");
+# setAttr -lock on ($cameraShape + ".focal");
+# setAttr -lock on ($cameraShape + ".filmback_w");
+# setAttr -lock on ($cameraShape + ".filmback_h");
+# setAttr -lock on ($cameraShape + ".pipelineparmsdict");
+
+# setAttr -lock on ($cameraShape + ".focalLength");
+# setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
+# setAttr -lock on ($cameraShape + ".verticalFilmAperture");
+# """
+
+# 	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
+
+# 	mel = mel.format(source=tde4.getProjectPath(),
+# 					footage=tde4.getCameraPath(get_cam_parms()['id']),
+# 					res_x=get_cam_parms()['resx'],
+# 					res_y=get_cam_parms()['resy'],
+# 					focal=get_cam_parms()['focal'],
+# 					filmback_w=get_filmback()['w'],
+# 					filmback_h=get_filmback()['h'],
+# 					fstart=get_frame_range()['first'],
+# 					fend=get_frame_range()['last'],
+# 					pipparms=pipelineparms,
+# 				)
+
+# 	return mel
 
 
 def convertToAngles(r3d):
@@ -353,6 +432,7 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 						f.write("xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;\n")
 						f.write("setAttr ($cameraShape+\".horizontalFilmOffset\") %.15f;\n"%lco_x);
 						f.write("setAttr ($cameraShape+\".verticalFilmOffset\") %.15f;\n"%lco_y);
+						f.write("setAttr ($cameraShape+\".renderable\") 1;\n");
 						p3d	= tde4.getPGroupPosition3D(campg,cam,1)
 						p3d	= convertZup(p3d,yup)
 						f.write("xform -translation %.15f %.15f %.15f $cameraTransform;\n"%(p3d[0],p3d[1],p3d[2]))
@@ -362,11 +442,12 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 						f.write("xform -scale 1 1 1 $cameraTransform;\n")
 
 						"""add pipeline attributes to camerashape"""
-						attribs = add_pipeline_attribs()
+						# attribs = add_pipeline_attribs() ### OBSOLETE WAY
+						attribs = add_pipeline_parms()
 						f.write(attribs)
 
 						# image plane...
-						f.write("\n\n// create image plane...\n")
+						f.write("\n\n\n\n// create image plane...\n")
 						f.write("string $imagePlane = `createNode imagePlane`;\n")
 						f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
 						f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
@@ -431,7 +512,7 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 				f.write("// create camera point group...\n")
 				name	= "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
 				f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
-				f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
+				# f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
 				f.write("\n")
 
 				# write points...
@@ -590,8 +671,11 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 def do_maya_import(path):
 	with MayaConnectWrapper() as maya:
-		maya.send('\n\nprint "{path}";'.format(path=path))
-		maya.send('source "{path}"'.format(path=path))
+		if DEBUG:
+			maya.send('file -new -f')
+
+		maya.send('print "{path}";'.format(path=path))
+		maya.send('source "{path}";'.format(path=path))
 
 
 
