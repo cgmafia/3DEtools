@@ -512,7 +512,7 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 				f.write("// create camera point group...\n")
 				name	= "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
 				f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
-				f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
+				# f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
 				f.write("\n")
 
 				# write points...
@@ -674,8 +674,8 @@ def do_maya_import(path):
 		if DEBUG:
 			maya.send('file -new -f')
 
-		maya.send('\n\nprint "{path}";'.format(path=path))
-		maya.send('source "{path}"'.format(path=path))
+		maya.send('print "{path}";'.format(path=path))
+		maya.send('source "{path}";'.format(path=path))
 
 
 
