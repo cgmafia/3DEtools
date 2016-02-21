@@ -102,6 +102,7 @@ def setup_maya_scene(mel, parms):
 			'\nsetAttr "defaultRenderGlobals.startFrame" {fstart};'
 			'\nsetAttr "defaultRenderGlobals.endFrame" {fend};'
 			'\nsetAttr "perspShape.renderable" 0;'
+			'\nsetAttr "defaultRenderGlobals.imageFormat" 32; // png'
 			'\n\n///////////////////////////////////////////////'
 			)
 
