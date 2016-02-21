@@ -24,7 +24,7 @@ TODO:
 # import sdv's python vector lib...
 
 import os
-import pickle
+# import pickle
 import json
 import socket
 import tde4
@@ -35,7 +35,8 @@ import NukeRadialStandardLensExport
 reload(TDE4Wrapper)
 reload(NukeRadialStandardLensExport)
 
-debug = os.environ.get('DEBUG', True)
+
+DEBUG = os.environ.get('DEBUG', False)
 
 
 class MayaConnectWrapper(object):
@@ -92,6 +93,26 @@ def get_frame_range():
 
 # 	return {'w': filmback_w, 'h': filmback_h}
 
+def setup_maya_scene(mel, parms):
+	scene = ('\n\n// // --> Maya Scene SetUp:\n'
+			'\nsetAttr "defaultResolution.width" {defaultresx};'
+			'\nsetAttr "defaultResolution.height" {defaultresy};'
+			# '\nrangeControl -minRange {fstart} -maxRange {fend};'
+			'\nplaybackOptions -minTime {fstart} -animationStartTime {fstart} -maxTime {fend} -animationEndTime {fend};'
+			'\nsetAttr "defaultRenderGlobals.startFrame" {fstart};'
+			'\nsetAttr "defaultRenderGlobals.endFrame" {fend};'
+			'\nsetAttr "perspShape.renderable" 0;'
+			'\n\n///////////////////////////////////////////////'
+			)
+
+	scene = scene.format(defaultresx=parms['res_x']['value'],
+					defaultresy=parms['res_y']['value'],
+					fstart=parms['fstart']['value'],
+					fend=parms['fend']['value'],
+					)
+
+	return mel + scene
+
 def add_parms_as_json_dict(mel, parms):
 	parms_as_dict = {}
 
@@ -100,8 +121,7 @@ def add_parms_as_json_dict(mel, parms):
 
 	mel += ('\n\n\naddAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;'
 			'\nsetAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipeparmsdict}";'
-			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");'
-			'\n\n\n//////////////////\n//////////////////\n')
+			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");')
 
 	mel = mel.format(pipeparmsdict=json.dumps(parms_as_dict).replace('"', '\\"'))
 
@@ -119,8 +139,6 @@ def add_pipeline_parms():
 
 	parm setup is separated from parms lock
 	to avoid trying to key locked attributes
-
-	- parmtypes as class?!
 	"""
 
 	project = TDE4Wrapper.TDE4Wrapper()
@@ -143,7 +161,7 @@ def add_pipeline_parms():
 			'fend': {'type': parmtypes['i'], 'value': project.frange[1]},
 	}
 
-	mel = '\n\n//////////\n// Pipeline Parms Custom Attributes\n///////////\n'
+	mel = '\n\n// // --> Pipeline Parms Custom Attributes:'
 
 	###
 	###
@@ -187,6 +205,7 @@ def add_pipeline_parms():
 	###
 
 	mel = add_parms_as_json_dict(mel, parms)
+	mel = setup_maya_scene(mel, parms)
 
 	return mel
 
@@ -412,6 +431,7 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 						f.write("xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;\n")
 						f.write("setAttr ($cameraShape+\".horizontalFilmOffset\") %.15f;\n"%lco_x);
 						f.write("setAttr ($cameraShape+\".verticalFilmOffset\") %.15f;\n"%lco_y);
+						f.write("setAttr ($cameraShape+\".renderable\") 1;\n");
 						p3d	= tde4.getPGroupPosition3D(campg,cam,1)
 						p3d	= convertZup(p3d,yup)
 						f.write("xform -translation %.15f %.15f %.15f $cameraTransform;\n"%(p3d[0],p3d[1],p3d[2]))
@@ -650,7 +670,7 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 def do_maya_import(path):
 	with MayaConnectWrapper() as maya:
-		if debug:
+		if DEBUG:
 			maya.send('file -new -f')
 
 		maya.send('\n\nprint "{path}";'.format(path=path))
