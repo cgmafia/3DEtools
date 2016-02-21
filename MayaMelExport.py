@@ -92,6 +92,21 @@ def get_frame_range():
 
 # 	return {'w': filmback_w, 'h': filmback_h}
 
+def add_parms_as_json_dict(mel, parms):
+	parms_as_dict = {}
+
+	for parm in parms:
+		parms_as_dict[parm] = parms[parm]['value']
+
+	mel += ('\n\n\naddAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;'
+			'\nsetAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipeparmsdict}";'
+			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");'
+			'\n\n\n//////////////////\n//////////////////\n')
+
+	mel = mel.format(pipeparmsdict=json.dumps(parms_as_dict).replace('"', '\\"'))
+
+	return mel
+
 
 def add_pipeline_parms():
 	"""
@@ -128,29 +143,50 @@ def add_pipeline_parms():
 			'fend': {'type': parmtypes['i'], 'value': project.frange[1]},
 	}
 
-	parms_as_dict = {}
 	mel = '\n\n//////////\n// Pipeline Parms Custom Attributes\n///////////\n'
 
+	###
+	###
+	###
+	# for parm in parms:
+	# 	if parms[parm]['type'] == 'string':
+	# 		parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+	# 				'\nsetAttr ($cameraShape + ".{name}") -type "{type}" "{source}";'
+	# 				'\nsetAttr -lock on ($cameraShape + ".{name}");')
+	# 	else:
+	# 		parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+	# 				'\nsetAttr ($cameraShape + ".{name}") {source};'
+	# 				'\nsetAttr -lock on ($cameraShape + ".{name}");')
+
+	# 	vartype = 'dataType' if parms[parm]['type'] == 'string' else 'attributeType'
+	# 	mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['value'])
+
+	###############################
 	for parm in parms:
 		if parms[parm]['type'] == 'string':
-			parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
-					'\nsetAttr ($cameraShape + ".{name}") -type "{type}" "{source}";'
-					'\nsetAttr -lock on ($cameraShape + ".{name}");')
+			attrtype = '-dataType "string"'
+			settype = '-type "string"'
+			value = '"{0}"'.format(parms[parm]['value'])
+
 		else:
-			parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
-					'\nsetAttr ($cameraShape + ".{name}") {source};'
-					'\nsetAttr -lock on ($cameraShape + ".{name}");')
+			attrtype = '-attributeType "{typename}"'.format(typename=parms[parm]['type'])
+			settype = ''
+			value = '{0}'.format(parms[parm]['value'])
 
-		vartype = 'dataType' if parms[parm]['type'] == 'string' else 'attributeType'
-		mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['value'])
-		parms_as_dict[parm] = parms[parm]['value']
+		parm_mel = ('\n\naddAttr -longName "{name}" {attrtype} $cameraShape;'
+				'\nsetAttr ($cameraShape + ".{name}") {settype} {value};'
+				'\nsetAttr -lock on ($cameraShape + ".{name}");')
 
-	mel += ('\n\n\naddAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;'
-			'\nsetAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipeparmsdict}";'
-			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");'
-			'\n\n\n//////////////////\n//////////////////\n')
+		mel += parm_mel.format(name=parm,
+								attrtype=attrtype,
+								settype=settype,
+								value=value,
+								)
+	###
+	###
+	###
 
-	mel = mel.format(pipeparmsdict=json.dumps(parms_as_dict).replace('"', '\\"'))
+	mel = add_parms_as_json_dict(mel, parms)
 
 	return mel
 
