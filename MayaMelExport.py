@@ -27,9 +27,13 @@ import os
 import socket
 import tde4
 from vl_sdv import *
-from TDE4Wrapper import TDE4Wrapper
+# from TDE4Wrapper import TDE4Wrapper
+import TDE4Wrapper
 import NukeRadialStandardLensExport
+reload(TDE4Wrapper)
 reload(NukeRadialStandardLensExport)
+
+debug = os.environ.get('DEBUG', True)
 
 
 class MayaConnectWrapper(object):
@@ -63,14 +67,14 @@ def get_mel_filename():
 
 
 def get_frame_range():
-	project = TDE4Wrapper()
+	project = TDE4Wrapper.TDE4Wrapper()
 	fstart, fend, step = project.frange
 
 	return {'first': fstart, 'last': fend}
 
 
 def get_cam_parms():
-	project = TDE4Wrapper()
+	project = TDE4Wrapper.TDE4Wrapper()
 	focal = tde4.getCameraFocalLength(project.cam_id, 1)
 	resx = tde4.getCameraImageWidth(project.cam_id)
 	resy = tde4.getCameraImageHeight(project.cam_id)
@@ -101,38 +105,53 @@ def add_pipeline_parms():
 
 	- parmtypes as class?!
 	"""
-	project = TDE4Wrapper()
+	# project = get_cam_parms()
+	projectw = TDE4Wrapper.TDE4Wrapper()
+	projectw.focal
 	parmtypes = {
 			's': 'string',
 			'i': 'short',
 			'f': 'float'
 	}
 	parms = {
-			'source3De': (parmtypes['s'], project.path),
-			'footage': (parmtypes['s'], project.footage),
+			'source3De': {'type': parmtypes['s'], 'content': projectw.path.replace('\\', '\\\\')},
+			'footage': {'type': parmtypes['s'], 'content': projectw.footage.replace('\\', '\\\\')},
+			'res_x': {'type': parmtypes['i'], 'content': projectw.res_x},
+			'res_y': {'type': parmtypes['i'], 'content': projectw.res_y},
+			'focal': {'type': parmtypes['f'], 'content': projectw.focal},
+			'filmback_h': {'type': parmtypes['f'], 'content': projectw.filmback_h * 10},
+			'filmback_v': {'type': parmtypes['f'], 'content': projectw.filmback_v * 10},
 	}
 
-	melsetup = ''
-	mellock = ''
+	mel = '\n\n//////////\n// Pipeline Parms Custom Attributes\n///////////\n'
 
 	for parm in parms:
-		pass
+		if parms[parm]['type'] == 'string':
+			parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+					'\nsetAttr ($cameraShape + ".{name}") -type "{type}" "{source}";'
+					'\nsetAttr -lock on ($cameraShape + ".{name}");')
+		else:
+			parm_mel = ('\n\naddAttr -longName "{name}" -{vartype} "{type}" $cameraShape;'
+					'\nsetAttr ($cameraShape + ".{name}") {source};'
+					'\nsetAttr -lock on ($cameraShape + ".{name}");')
 
-	mel = {'parmsetup': melsetup, 'parmslock': mellock}
+		vartype = 'dataType' if parms[parm]['type'] == 'string' else 'attributeType'
+		mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['content'])
 
 	return mel
 
 
-def add_pipeline_attribs():
+def add_pipeline_attribs_OBSOLETE():
+	print add_pipeline_parms()
 	mel = """
 // add pipeline attribs
-addAttr -longName "source" -dataType "string" $cameraShape;
-addAttr -longName "footage" -dataType "string" $cameraShape;
-addAttr -longName "res_x" -attributeType "short" $cameraShape;
-addAttr -longName "res_y" -attributeType "short" $cameraShape;
-addAttr -longName "focal" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
-addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
+-------addAttr -longName "source" -dataType "string" $cameraShape;
+-------addAttr -longName "footage" -dataType "string" $cameraShape;
+-------addAttr -longName "res_x" -attributeType "short" $cameraShape;
+-------addAttr -longName "res_y" -attributeType "short" $cameraShape;
+-------addAttr -longName "focal" -attributeType "float" $cameraShape;
+-------addAttr -longName "filmback_w" -attributeType "float" $cameraShape;
+-------addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
 addAttr -longName "fstart" -attributeType short $cameraShape;
 addAttr -longName "fend" -attributeType short $cameraShape;
 addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
@@ -159,19 +178,9 @@ setAttr -lock on ($cameraShape + ".filmback_w");
 setAttr -lock on ($cameraShape + ".filmback_h");
 setAttr -lock on ($cameraShape + ".pipelineparmsdict");
 
-//setAttr -lock on ($cameraShape + ".focalLength");
+setAttr -lock on ($cameraShape + ".focalLength");
 setAttr -lock on ($cameraShape + ".horizontalFilmAperture");
 setAttr -lock on ($cameraShape + ".verticalFilmAperture");
-
-//setAttr -lock on ($cameraTransform + ".translateX");
-//setAttr -lock on ($cameraTransform + ".translateY");
-//setAttr -lock on ($cameraTransform + ".translateZ");
-//setAttr -lock on ($cameraTransform + ".rotateX");
-//setAttr -lock on ($cameraTransform + ".rotateY");
-//setAttr -lock on ($cameraTransform + ".rotateZ");
-//setAttr -lock on ($cameraTransform + ".scaleX");
-//setAttr -lock on ($cameraTransform + ".scaleY");
-//setAttr -lock on ($cameraTransform + ".scaleZ");
 """
 
 	pipelineparms = '1h1h1h1h1h1h1h1h1h1h1h1'
@@ -362,11 +371,12 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 						f.write("xform -scale 1 1 1 $cameraTransform;\n")
 
 						"""add pipeline attributes to camerashape"""
-						attribs = add_pipeline_attribs()
+						# attribs = add_pipeline_attribs() ### OBSOLETE WAY
+						attribs = add_pipeline_parms()
 						f.write(attribs)
 
 						# image plane...
-						f.write("\n\n// create image plane...\n")
+						f.write("\n\n\n\n// create image plane...\n")
 						f.write("string $imagePlane = `createNode imagePlane`;\n")
 						f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
 						f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
@@ -590,6 +600,9 @@ string $sceneGroupName = `group -em -name "mm_{name}"`;
 
 def do_maya_import(path):
 	with MayaConnectWrapper() as maya:
+		if debug:
+			maya.send('file -new -f')
+
 		maya.send('\n\nprint "{path}";'.format(path=path))
 		maya.send('source "{path}"'.format(path=path))
 
