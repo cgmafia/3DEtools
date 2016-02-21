@@ -24,6 +24,8 @@ TODO:
 # import sdv's python vector lib...
 
 import os
+import pickle
+import json
 import socket
 import tde4
 from vl_sdv import *
@@ -105,24 +107,28 @@ def add_pipeline_parms():
 
 	- parmtypes as class?!
 	"""
-	# project = get_cam_parms()
-	projectw = TDE4Wrapper.TDE4Wrapper()
-	projectw.focal
+
+	project = TDE4Wrapper.TDE4Wrapper()
+	project.focal
 	parmtypes = {
 			's': 'string',
 			'i': 'short',
 			'f': 'float'
 	}
+
 	parms = {
-			'source3De': {'type': parmtypes['s'], 'content': projectw.path.replace('\\', '\\\\')},
-			'footage': {'type': parmtypes['s'], 'content': projectw.footage.replace('\\', '\\\\')},
-			'res_x': {'type': parmtypes['i'], 'content': projectw.res_x},
-			'res_y': {'type': parmtypes['i'], 'content': projectw.res_y},
-			'focal': {'type': parmtypes['f'], 'content': projectw.focal},
-			'filmback_h': {'type': parmtypes['f'], 'content': projectw.filmback_h * 10},
-			'filmback_v': {'type': parmtypes['f'], 'content': projectw.filmback_v * 10},
+			'source3De': {'type': parmtypes['s'], 'value': project.path.replace('\\', '\\\\')},
+			'footage': {'type': parmtypes['s'], 'value': project.footage.replace('\\', '\\\\')},
+			'res_x': {'type': parmtypes['i'], 'value': project.res_x},
+			'res_y': {'type': parmtypes['i'], 'value': project.res_y},
+			'focal': {'type': parmtypes['f'], 'value': project.focal},
+			'filmback_h': {'type': parmtypes['f'], 'value': project.filmback_h * 10},
+			'filmback_v': {'type': parmtypes['f'], 'value': project.filmback_v * 10},
+			'fstart': {'type': parmtypes['i'], 'value': project.frange[0]},
+			'fend': {'type': parmtypes['i'], 'value': project.frange[1]},
 	}
 
+	parms_as_dict = {}
 	mel = '\n\n//////////\n// Pipeline Parms Custom Attributes\n///////////\n'
 
 	for parm in parms:
@@ -136,7 +142,15 @@ def add_pipeline_parms():
 					'\nsetAttr -lock on ($cameraShape + ".{name}");')
 
 		vartype = 'dataType' if parms[parm]['type'] == 'string' else 'attributeType'
-		mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['content'])
+		mel += parm_mel.format(name=parm, vartype=vartype, type=parms[parm]['type'], source=parms[parm]['value'])
+		parms_as_dict[parm] = parms[parm]['value']
+
+	mel += ('\n\n\naddAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;'
+			'\nsetAttr ($cameraShape + ".pipelineparmsdict") -type "string" "{pipeparmsdict}";'
+			'\nsetAttr -lock on ($cameraShape + ".pipelineparmsdict");'
+			'\n\n\n//////////////////\n//////////////////\n')
+
+	mel = mel.format(pipeparmsdict=json.dumps(parms_as_dict).replace('"', '\\"'))
 
 	return mel
 
@@ -154,7 +168,7 @@ def add_pipeline_attribs_OBSOLETE():
 -------addAttr -longName "filmback_h" -attributeType "float" $cameraShape;
 addAttr -longName "fstart" -attributeType short $cameraShape;
 addAttr -longName "fend" -attributeType short $cameraShape;
-addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
+-------addAttr -longName "pipelineparmsdict" -dataType "string" $cameraShape;
 
 setAttr ($cameraShape + ".source") -type "string" "{source}";
 setAttr ($cameraShape + ".footage") -type "string" "{footage}";
