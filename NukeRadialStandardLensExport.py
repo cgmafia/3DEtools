@@ -252,11 +252,15 @@ def main(melscript):
 			if not nuke_path.endswith('.nk'):
 				nuke_path	= nuke_path+'.nk'
 
+	### THIS IS IMPORTANT FOR ZOOMCURVES:
+	### SET OFFSET TO 0 ALL THE TIME.
 	# check if offset should be applied or not if there is one
-			if tde4.getCameraZoomingFlag(cam) and offset != 0:
-				n	= tde4.getWidgetValue(nuke_node_req,"stfr_menu")
-				if n != 1:
-					offset = 0
+			# if tde4.getCameraZoomingFlag(cam) and offset != 0:
+			# 	n	= tde4.getWidgetValue(nuke_node_req,"stfr_menu")
+			# 	if n != 1:
+			# 		offset = 0
+
+			offset = 0
 
 	# export
 			# if ret == 1:
