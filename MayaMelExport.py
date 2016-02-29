@@ -3,10 +3,6 @@
 3DE4r5 extended
 
 github/danielforgacs
-
-TODO:
-	- lock channels after keyframes
-	- set maya anim frame range
 """
 #
 #
@@ -94,6 +90,18 @@ def get_frame_range():
 # 	return {'w': filmback_w, 'h': filmback_h}
 
 def setup_maya_scene(mel, parms):
+	"""
+	sets up render resolution
+	and other scene related parameters
+	based on the footage and 3De
+	scene settings
+
+	adds extra scene related parameters
+	to the camerashape, sets up
+	defaults, sets up channel box
+	controls
+	"""
+
 	scene = ('\n\n// // --> Maya Scene SetUp:\n'
 			'\nsetAttr "defaultResolution.width" {defaultresx};'
 			'\nsetAttr "defaultResolution.height" {defaultresy};'
@@ -103,8 +111,53 @@ def setup_maya_scene(mel, parms):
 			'\nsetAttr "defaultRenderGlobals.endFrame" {fend};'
 			'\nsetAttr "perspShape.renderable" 0;'
 			'\nsetAttr "defaultRenderGlobals.imageFormat" 32; // png'
+			#
+			'\nsetAttr "defaultRenderGlobals.animation" 1;'
+			'\nsetAttr defaultRenderGlobals.outFormatControl 0;'
+			'\nsetAttr defaultRenderGlobals.animation 1;'
+			'\nsetAttr defaultRenderGlobals.putFrameBeforeExt 1;'
+			'\nsetAttr defaultRenderGlobals.extensionPadding 4;'
+			'\nsetAttr defaultRenderGlobals.periodInExt 1;'
+			'\nsetAttr defaultRenderGlobals.imageFilePrefix  -type "string" "<Scene>_<Camera>_<RenderLayer>/<Scene>_<Camera>_<RenderLayer>";'
+			#
 			'\n\n///////////////////////////////////////////////'
 			)
+
+	###
+	scene +=('\n\n// // --> camera channel box setup\n'
+			'\nsetAttr ($cameraShape + ".displayFilmGate") 1;'
+			'\nsetAttr ($cameraShape + ".displayResolution") 1;'
+			'\nsetAttr ($cameraShape + ".displayGateMaskColor") -type double3 0 0 0 ;'
+			'\nsetAttr ($cameraShape + ".nearClipPlane") 1;'
+			'\nsetAttr ($cameraShape + ".farClipPlane") 1000000;'
+			'\nsetAttr -cb true ($cameraShape + ".filmback_h");'
+			'\nsetAttr -cb true ($cameraShape + ".filmback_v");'
+			'\nsetAttr -cb true ($cameraShape + ".horizontalFilmOffset");'
+			'\nsetAttr -cb true ($cameraShape + ".horizontalPan");'
+			'\nsetAttr -cb true ($cameraShape + ".overscan");'
+			'\nsetAttr -cb true ($cameraShape + ".panZoomEnabled");'
+			'\nsetAttr -cb true ($cameraShape + ".postScale");'
+			'\nsetAttr -cb true ($cameraShape + ".verticalFilmOffset");'
+			'\nsetAttr -cb true ($cameraShape + ".verticalPan");'
+			'\nsetAttr -cb true ($cameraShape + ".zoom");'
+			'\nsetAttr -k off ($cameraShape + ".centerOfInterest");'
+			'\nsetAttr -k off ($cameraShape + ".lensSqueezeRatio");'
+			'\nsetAttr -cb true ($cameraShape + ".fStop");'
+			'\nsetAttr -cb true ($cameraShape + ".horizontalFilmAperture");'
+			'\nsetAttr -cb true ($cameraShape + ".verticalFilmAperture");'
+			'\nsetAttr -k off ($cameraTransform + ".scaleX");'
+			'\nsetAttr -k off ($cameraTransform + ".scaleY");'
+			'\nsetAttr -k off ($cameraTransform + ".scaleZ");'
+			'\nsetAttr -k off ($cameraTransform + ".visibility");'
+			'\nsetAttr -cb true ($cameraTransform + ".scaleX");'
+			'\nsetAttr -cb true ($cameraTransform + ".scaleY");'
+			'\nsetAttr -cb true ($cameraTransform + ".scaleZ");'
+			'\nsetAttr -cb true ($cameraTransform + ".visibility");'
+			'\nsetAttr -lock true ($cameraShape + ".hfa");'
+			'\nsetAttr -lock true ($cameraShape + ".vfa");'
+			'\n\n// // --> camera channel box setup end...'
+		)
+	###
 
 	scene = scene.format(defaultresx=parms['res_x']['value'],
 					defaultresy=parms['res_y']['value'],
