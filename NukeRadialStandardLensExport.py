@@ -32,6 +32,7 @@ author: github/danielforgacs
 import tde4
 import string
 import re
+from TDE4Wrapper import TDE4Wrapper
 
 # We translate our API model and parameter names into Nuke identifiers.
 # The rules are:
@@ -260,7 +261,9 @@ def main(melscript):
 			# 	if n != 1:
 			# 		offset = 0
 
-			offset = 0
+			# offset = 0
+			temp_cam = TDE4Wrapper()
+			offset, kk, ii = temp_cam.frange
 
 	# export
 			# if ret == 1:
