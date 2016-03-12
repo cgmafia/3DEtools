@@ -75,10 +75,10 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 # xa,xb,ya,yb in unit coordinates, in this order.
 	fov = tde4.getCameraFOV(cam)
 
-	print 'camera: ', tde4.getCameraName(cam)
-	print 'offset:', offset
-	print 'lens:', tde4.getLensName(lens)
-	print 'model: ', model
+	# print 'camera: ', tde4.getCameraName(cam)
+	# print 'offset:', offset
+	# print 'lens:', tde4.getLensName(lens)
+	# print 'model: ', model
 
 	f = open(nuke_path,"w")
 	try:
@@ -88,7 +88,7 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 
 # write focal length curve if dynamic
 		if tde4.getCameraZoomingFlag(cam):
-			print 'dynamic focal length'
+			# print 'dynamic focal length'
 			f.write(' tde4_focal_length_cm {{curve ')
 			for frame in range(1,num_frames + 1):
 				f.write ('x%i' % (frame+offset))
@@ -96,12 +96,12 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 			f.write('}}\n')
 # write static focal length else
 		else:
-			print 'static focal length'
+			# print 'static focal length'
 			f.write(' tde4_focal_length_cm %.7f \n' % tde4.getCameraFocalLength(cam,1))
 # write focus distance curve if dynamic
 		try:
 			if tde4.getCameraFocusMode(cam) == "FOCUS_DYNAMIC":
-				print 'dynamic focus distance'
+				# print 'dynamic focus distance'
 				f.write(' tde4_custom_focus_distance_cm {{curve ')
 				for frame in range(1,num_frames + 1):
 					f.write ('x%i' % (frame+offset))
@@ -112,7 +112,7 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 			pass
 # write static focus distance else
 		else:
-			print 'static focus distance'
+			# print 'static focus distance'
 			try:
 				f.write(' tde4_custom_focus_distance_cm %.7f \n' % tde4.getCameraFocus(cam,1))
 			except:
@@ -150,7 +150,7 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 
 		if old_api:
 			if dyndistmode=="DISTORTION_DYNAMIC_FOCAL_LENGTH":
-				print 'dynamic lens distortion, focal length'
+				# print 'dynamic lens distortion, focal length'
 # dynamic focal length (zoom)
 				for para in (getLDmodelParameterList(model)):
 					f.write(' ' + nukify_name(para) + ' {{curve ')
@@ -161,7 +161,7 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 					f.write('}}\n')
 
 			if dyndistmode=="DISTORTION_DYNAMIC_FOCUS_DISTANCE":
-				print 'dynamic lens distortion, focus distance'
+				# print 'dynamic lens distortion, focus distance'
 # dynamic focus distance
 				for para in (getLDmodelParameterList(model)):
 					f.write(' ' + nukify_name(para) + ' {{curve ')
@@ -177,17 +177,17 @@ def exportNukeDewarpNode(cam, offset, nuke_path):
 
 # static distortion
 			if dyndistmode=="DISTORTION_STATIC":
-				print 'static lens distortion'
+				# print 'static lens distortion'
 				for para in (getLDmodelParameterList(model)):
 					f.write(' ' + nukify_name(para) + ' %.7f \n'%tde4.getLensLDAdjustableParameter(lens, para, 1))
 		else:
 # new API
 			if dyndistmode=="DISTORTION_STATIC":
-				print 'static lens distortion'
+				# print 'static lens distortion'
 				for para in (getLDmodelParameterList(model)):
 					f.write(' ' + nukify_name(para) + ' %.7f \n'%tde4.getLensLDAdjustableParameter(lens, para, 1, 1))
 			else:
-				print 'dynamic lens distortion,'
+				# print 'dynamic lens distortion,'
 # dynamic
 				for para in (getLDmodelParameterList(model)):
 					f.write(' ' + nukify_name(para) + ' {{curve ')
@@ -267,16 +267,16 @@ def main(melscript):
 
 	# export
 			# if ret == 1:
-			print '------------------ Export tde4 Nuke Distortion Node ------------------'
+			# print '------------------ Export tde4 Nuke Distortion Node ------------------'
 			exportNukeDewarpNode(cam, offset, nuke_path)
-			print 'file:',nuke_path, '\n'
+			# print 'file:',nuke_path, '\n'
 
 
 	except CancelException, e:
 		print e
 
 	except Exception, e:
-		print e
+		# print e
 		tde4.postQuestionRequester('Error ', str(e), '  OK  ')
 
 	return nuke_path
