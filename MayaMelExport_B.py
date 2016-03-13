@@ -44,6 +44,22 @@ def import_to_maya(path):
         maya.send('source "{path}";'.format(path=path))
 
 
+def get_mel_filename():
+    projectpath = os.path.abspath(tde4.getProjectPath())
+    folder = os.path.dirname(projectpath)
+    projectname = os.path.basename(projectpath)
+    mel_name = projectname.replace('3de', 'mel')
+    path = os.path.join(folder, 'exports', mel_name)
+    path = path.replace('\\', '/')
+
+    if not os.path.exists(os.path.join(folder, 'exports')):
+        os.mkdir(os.path.join(folder, 'exports'))
+
+    # print('path: {0}'.format(path))
+
+    return {'path': path, 'filename': projectname}
+
+
 #
 # functions...
 
@@ -137,13 +153,15 @@ def tde4_export():
         frame0  = float(tde4.getWidgetValue(req,"startframe_field"))
         frame0  -= 1
         hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
+        path = get_mel_filename()['path']
+
         if path!=None:
             if not path.endswith('.mel'):
                 path = path+'.mel'
 
             ### path gets used again for image planes
             ### saving for maya
-            mel_path = path.replace('\\', '/')
+            mel_path = path
 
             f   = open(path,"w")
             if not f.closed:
@@ -426,7 +444,7 @@ def tde4_export():
 
                 f.write("\n")
                 f.close()
-                tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
+                # tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
             else:
                 tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
@@ -435,13 +453,13 @@ def tde4_export():
 
 if __name__ == '__main__':
     print('~@+' * 10)
+
     mel_path = tde4_export()
 
     print('--> exported mel script file: ', mel_path)
 
     delens_node = NukeRadialStandardLensExport.main(melscript)
     print('--> Nuke lens distortion node: ', delens_node)
-
 
     try:
         import_to_maya(mel_path)
