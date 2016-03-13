@@ -21,6 +21,8 @@ github/danielforgacs
 
 import socket
 from vl_sdv import *
+import NukeRadialStandardLensExport
+
 
 class MayaConnectWrapper(object):
     def __enter__(self):
@@ -432,12 +434,19 @@ def tde4_export():
 
 
 if __name__ == '__main__':
+    print('~@+' * 10)
     mel_path = tde4_export()
 
     print('--> exported mel script file: ', mel_path)
+
+    delens_node = NukeRadialStandardLensExport.main(melscript)
+    print('--> Nuke lens distortion node: ', delens_node)
+
 
     try:
         import_to_maya(mel_path)
         print('--> mel sourced in Maya...')
     except:
         pass
+
+    print('--> Maya export Done...')
