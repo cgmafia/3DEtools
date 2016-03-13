@@ -19,7 +19,28 @@ github/danielforgacs
 #
 # import sdv's python vector lib...
 
+import socket
 from vl_sdv import *
+
+class MayaConnectWrapper(object):
+    def __enter__(self):
+        self.maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.maya.connect(('localhost', 6005))
+        except:
+            print('--> Maya import failed...')
+
+        return self.maya
+
+    def __exit__(self, type, value, traceback):
+        self.maya.close()
+
+
+def import_to_maya(path):
+    with MayaConnectWrapper() as maya:
+        maya.send('print "{path}";'.format(path=path))
+        maya.send('source "{path}";'.format(path=path))
+
 
 #
 # functions...
@@ -71,7 +92,7 @@ def prepareImagePath(path,startframe):
     return path
 
 
-def main():
+def tde4_export():
 
     #
     # main script...
@@ -115,7 +136,13 @@ def main():
         frame0  -= 1
         hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
         if path!=None:
-            if not path.endswith('.mel'): path = path+'.mel'
+            if not path.endswith('.mel'):
+                path = path+'.mel'
+
+            ### path gets used again for image planes
+            ### saving for maya
+            mel_path = path.replace('\\', '/')
+
             f   = open(path,"w")
             if not f.closed:
 
@@ -401,6 +428,16 @@ def main():
             else:
                 tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
+    return mel_path
+
 
 if __name__ == '__main__':
-    main()
+    mel_path = tde4_export()
+
+    print('--> exported mel script file: ', mel_path)
+
+    try:
+        import_to_maya(mel_path)
+        print('--> mel sourced in Maya...')
+    except:
+        pass
