@@ -30,7 +30,7 @@ class MayaConnectWrapper(object):
         try:
             self.maya.connect(('localhost', 6005))
         except:
-            print('--> Maya import failed...')
+            print('--> >>> Maya import failed... <<<')
 
         return self.maya
 
@@ -144,8 +144,9 @@ def tde4_export():
     offset  = tde4.getCameraFrameOffset(cam)
     tde4.setWidgetValue(req,"startframe_field",str(offset))
 
-    ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
-    if ret==1:
+    ### Turned off parameter window
+    # ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+    if True:
         # yup   = tde4.getWidgetValue(req,"mode_menu")
         # if yup==2: yup = 0
         yup = 1
@@ -467,4 +468,4 @@ if __name__ == '__main__':
     except:
         pass
 
-    print('--> Maya export Done...')
+    print('--> Export Done...')
