@@ -271,6 +271,7 @@ def main(melscript):
 			exportNukeDewarpNode(cam, offset, nuke_path)
 			# print 'file:',nuke_path, '\n'
 
+			return nuke_path
 
 	except CancelException, e:
 		print e
@@ -278,5 +279,3 @@ def main(melscript):
 	except Exception, e:
 		# print e
 		tde4.postQuestionRequester('Error ', str(e), '  OK  ')
-
-	return nuke_path
