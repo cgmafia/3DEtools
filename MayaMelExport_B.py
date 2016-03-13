@@ -246,7 +246,9 @@ def main():
                 f.write("// create camera point group...\n")
                 name    = "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
                 f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
-                f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
+                ### next line is unnecessery
+                ### and it makes multiple imports fail
+                # f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
                 f.write("\n")
 
                 # write points...
