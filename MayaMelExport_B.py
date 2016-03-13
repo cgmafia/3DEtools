@@ -19,6 +19,7 @@ github/danielforgacs
 #
 # import sdv's python vector lib...
 
+import os
 import socket
 from vl_sdv import *
 import NukeRadialStandardLensExport
@@ -459,7 +460,8 @@ if __name__ == '__main__':
 
     print('--> exported mel script file: ', mel_path)
 
-    delens_node = NukeRadialStandardLensExport.main(melscript)
+    delens_node = NukeRadialStandardLensExport.main(mel_path)
+
     print('--> Nuke lens distortion node: ', delens_node)
 
     try:
