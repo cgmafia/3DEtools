@@ -61,6 +61,71 @@ def get_mel_filename():
     return {'path': path, 'filename': projectname}
 
 
+def write_pipeline_parms(mel, path):
+    with open(path, 'a') as f:
+        f.write(mel)
+
+
+######################################7#
+def get_pipeline_parms(delense_node):
+    # project = TDE4Wrapper.TDE4Wrapper()
+    # project.focal
+    parmtypes = {
+            's': 'string',
+            'i': 'short',
+            'f': 'float'
+        }
+
+    cam_id = tde4.getCurrentCamera()
+    lens_id = tde4.getCameraLens(cam_id)
+    fstart, fend, incr = tde4.getCameraSequenceAttr(cam_id)
+
+    parms = {
+            'source3De': {'type': parmtypes['s'], 'value': tde4.getProjectPath().replace('\\', '/')},
+            'delense_node': {'type': parmtypes['s'], 'value': delense_node},
+            'footage': {'type': parmtypes['s'], 'value': tde4.getCameraPath(cam_id).replace('\\', '/')},
+            'res_x': {'type': parmtypes['i'], 'value': tde4.getCameraImageWidth(cam_id)},
+            'res_y': {'type': parmtypes['i'], 'value': tde4.getCameraImageHeight(cam_id)},
+            'fstart': {'type': parmtypes['i'], 'value': fstart},
+            'fend': {'type': parmtypes['i'], 'value': fend},
+            'filmback_h': {'type': parmtypes['f'], 'value': tde4.getLensFBackWidth(lens_id) * 10},
+            'filmback_v': {'type': parmtypes['f'], 'value': tde4.getLensFBackHeight(lens_id) * 10},
+            'focal': {'type': parmtypes['f'], 'value': tde4.getCameraFocalLength(cam_id, fstart * 10)},
+        }
+
+    mel = '\n\n// // --> Pipeline Parms Custom Attributes:'
+
+    for parm in parms:
+        if parms[parm]['type'] == 'string':
+            attrtype = '-dataType "string"'
+            settype = '-type "string"'
+            value = '"{0}"'.format(parms[parm]['value'])
+
+        else:
+            attrtype = '-attributeType "{typename}"'.format(typename=parms[parm]['type'])
+            settype = ''
+            value = '{0}'.format(parms[parm]['value'])
+
+        parm_mel = (
+                    '\n\naddAttr -longName "{name}" {attrtype} $cameraShape;'
+                    '\nsetAttr ($cameraShape + ".{name}") {settype} {value};'
+                    # '\nsetAttr -lock on ($cameraShape + ".{name}");'
+                )
+
+        mel += parm_mel.format(name=parm,
+                                attrtype=attrtype,
+                                settype=settype,
+                                value=value,
+                            )
+
+    # mel = add_parms_as_json_dict(mel, parms)
+    # mel = setup_maya_scene(mel, parms)
+
+    return mel
+
+###########################################
+
+
 #
 # functions...
 
@@ -453,16 +518,18 @@ def tde4_export():
     return mel_path
 
 
-if __name__ == '__main__':
+def main():
     print('~@+' * 10)
 
     mel_path = tde4_export()
-
     print('--> exported mel script file: ', mel_path)
 
-    delens_node = NukeRadialStandardLensExport.main(mel_path)
+    delense_node = NukeRadialStandardLensExport.main(mel_path)
+    print('--> Nuke lens distortion node: ', delense_node)
 
-    print('--> Nuke lens distortion node: ', delens_node)
+    pipeline_parms = get_pipeline_parms(delense_node)
+    write_pipeline_parms(pipeline_parms, mel_path)
+    print('--> updated pipeline parameters: ')
 
     try:
         import_to_maya(mel_path)
@@ -471,3 +538,7 @@ if __name__ == '__main__':
         pass
 
     print('--> Export Done...')
+
+
+if __name__ == '__main__':
+    main()
