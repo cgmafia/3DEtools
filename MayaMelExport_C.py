@@ -21,8 +21,7 @@ github/danielforgacs
 
 from vl_sdv import *
 
-#
-# functions...
+### functions...
 
 def convertToAngles(r3d):
     rot = rot3d(mat3d(r3d)).angles(VL_APPLY_ZXY)
@@ -71,12 +70,9 @@ def prepareImagePath(path,startframe):
     return path
 
 
-#
-# main script...
+### main script...
 
-
-#
-# search for camera point group...
+### search for camera point group...
 
 campg   = None
 pgl = tde4.getPGroupList()
@@ -86,8 +82,7 @@ if campg==None:
     tde4.postQuestionRequester("Export Maya...","Error, there is no camera point group.","Ok")
 
 
-#
-# open requester...
+### open requester...
 
 try:
     req = _export_requester_maya
@@ -103,21 +98,23 @@ offset  = tde4.getCameraFrameOffset(cam)
 tde4.setWidgetValue(req,"startframe_field",str(offset))
 
 ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+
 if ret==1:
     yup = 1
     path    = tde4.getWidgetValue(req,"file_browser")
     frame0  = float(tde4.getWidgetValue(req,"startframe_field"))
     frame0  -= 1
-    hide_ref= tde4.getWidgetValue(req,"hide_ref_frames")
+    hide_ref = tde4.getWidgetValue(req,"hide_ref_frames")
+
     if path!=None:
-        if not path.endswith('.mel'): path = path+'.mel'
+        if not path.endswith('.mel'):
+            path = path+'.mel'
+
         f   = open(path,"w")
+
         if not f.closed:
-            f.write("//\n")
-            f.write("// Maya/MEL export data written by %s\n"%tde4.get3DEVersion())
-            f.write("//\n")
-            f.write("// All lengths are in centimeter, all angles are in degree.\n")
-            f.write("//\n\n")
+            f.write("BLA//\n// Maya/MEL export data written by %s\n"%tde4.get3DEVersion())
+            f.write("//\n// All lengths are in centimeter, all angles are in degree.\n//\n\n")
 
             ### write scene group...
 
@@ -153,8 +150,7 @@ if ret==1:
                     focal       = focal*10.0
 
                     ### create camera...
-                    f.write("\n")
-                    f.write("// create camera %s...\n"%name)
+                    f.write("\n// create camera %s...\n"%name)
                     f.write("string $cameraNodes[] = `camera -name \"%s\" -hfa %.15f  -vfa %.15f -fl %.15f -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff \"overscan\"`;\n"%(name,fback_w,fback_h,focal))
                     f.write("string $cameraTransform = $cameraNodes[0];\n")
                     f.write("string $cameraShape = $cameraNodes[1];\n")
@@ -170,8 +166,7 @@ if ret==1:
                     f.write("xform -scale 1 1 1 $cameraTransform;\n")
 
                     ### image plane...
-                    f.write("\n")
-                    f.write("// create image plane...\n")
+                    f.write("\n// create image plane...\n")
                     f.write("string $imagePlane = `createNode imagePlane`;\n")
                     f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
                     f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
@@ -190,8 +185,7 @@ if ret==1:
                     f.write("setAttr ($imagePlane  + \".depth\") (9000/2);\n")
 
                     ### parent camera to scene group...
-                    f.write("\n")
-                    f.write("// parent camera to scene group...\n")
+                    f.write("\n// parent camera to scene group...\n")
                     f.write("parent $cameraTransform $sceneGroupName;\n")
 
                     if camType=="REF_FRAME" and hide_ref:
@@ -199,8 +193,7 @@ if ret==1:
 
                     ### animate camera...
                     if camType!="REF_FRAME":
-                        f.write("\n")
-                        f.write("// animating camera %s...\n"%name)
+                        f.write("\n// animating camera %s...\n"%name)
                         f.write("playbackOptions -min %d -max %d;\n"%(1+frame0,noframes+frame0))
                         f.write("\n")
 
@@ -232,8 +225,7 @@ if ret==1:
 
             ### write camera point group...
 
-            f.write("\n")
-            f.write("// create camera point group...\n")
+            f.write("\n// create camera point group...\n")
             name    = "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
             f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
             f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
@@ -248,15 +240,13 @@ if ret==1:
                     name    = "p%s"%validName(name)
                     p3d = tde4.getPointCalcPosition3D(campg,p)
                     p3d = convertZup(p3d,yup)
-                    f.write("\n")
-                    f.write("// create point %s...\n"%name)
+                    f.write("\n// create point %s...\n"%name)
                     f.write("string $locator = stringArrayToString(`spaceLocator -name %s`, \"\");\n"%name)
                     f.write("$locator = (\"|\" + $locator);\n")
                     f.write("xform -t %.15f %.15f %.15f $locator;\n"%(p3d[0],p3d[1],p3d[2]))
                     f.write("parent $locator $pointGroupName;\n")
 
-            f.write("\n")
-            f.write("xform -zeroTransformPivots -rotateOrder zxy -scale 1.000000 1.000000 1.000000 $pointGroupName;\n")
+            f.write("\nxform -zeroTransformPivots -rotateOrder zxy -scale 1.000000 1.000000 1.000000 $pointGroupName;\n")
             f.write("\n")
 
             ### write object/mocap point groups...
@@ -268,8 +258,7 @@ if ret==1:
 
             for pg in pgl:
                 if tde4.getPGroupType(pg)=="OBJECT" and camera!=None:
-                    f.write("\n")
-                    f.write("// create object point group...\n")
+                    f.write("\n// create object point group...\n")
                     pgname  = "objectPGroup_%s_%d_1"%(validName(tde4.getPGroupName(pg)),index)
                     index   += 1
                     f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%pgname)
@@ -284,20 +273,17 @@ if ret==1:
                             name    = "p%s"%validName(name)
                             p3d = tde4.getPointCalcPosition3D(pg,p)
                             p3d = convertZup(p3d,yup)
-                            f.write("\n")
-                            f.write("// create point %s...\n"%name)
+                            f.write("\n// create point %s...\n"%name)
                             f.write("string $locator = stringArrayToString(`spaceLocator -name %s`, \"\");\n"%name)
                             f.write("$locator = (\"|\" + $locator);\n")
                             f.write("xform -t %.15f %.15f %.15f $locator;\n"%(p3d[0],p3d[1],p3d[2]))
                             f.write("parent $locator $pointGroupName;\n")
 
-                    f.write("\n")
                     scale   = tde4.getPGroupScale3D(pg)
-                    f.write("xform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
+                    f.write("\nxform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
 
                     ### animate object point group...
-                    f.write("\n")
-                    f.write("// animating point group %s...\n"%pgname)
+                    f.write("\n// animating point group %s...\n"%pgname)
                     frame   = 1
 
                     while frame<=noframes:
@@ -322,8 +308,7 @@ if ret==1:
 
                 ### mocap point groups...
                 if tde4.getPGroupType(pg)=="MOCAP" and camera!=None:
-                    f.write("\n")
-                    f.write("// create mocap point group...\n")
+                    f.write("\n// create mocap point group...\n")
                     pgname  = "objectPGroup_%s_%d_1"%(validName(tde4.getPGroupName(pg)),index)
                     index   += 1
                     f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%pgname)
@@ -338,8 +323,7 @@ if ret==1:
                             name    = "p%s"%validName(name)
                             p3d = tde4.getPointMoCapCalcPosition3D(pg,p,camera,1)
                             p3d = convertZup(p3d,yup)
-                            f.write("\n")
-                            f.write("// create point %s...\n"%name)
+                            f.write("\n// create point %s...\n"%name)
                             f.write("string $locator = stringArrayToString(`spaceLocator -name %s`, \"\");\n"%name)
                             f.write("$locator = (\"|\" + $locator);\n")
                             f.write("xform -t %.15f %.15f %.15f $locator;\n"%(p3d[0],p3d[1],p3d[2]))
@@ -353,13 +337,11 @@ if ret==1:
 
                             f.write("parent $locator $pointGroupName;\n")
 
-                    f.write("\n")
                     scale   = tde4.getPGroupScale3D(pg)
-                    f.write("xform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
+                    f.write("\nxform -zeroTransformPivots -rotateOrder zxy -scale %.15f %.15f %.15f $pointGroupName;\n"%(scale,scale,scale))
 
                     ### animate mocap point group...
-                    f.write("\n")
-                    f.write("// animating point group %s...\n"%pgname)
+                    f.write("\n// animating point group %s...\n"%pgname)
                     frame   = 1
 
                     while frame<=noframes:
