@@ -1,8 +1,9 @@
-//Maya 2015 Project Definition
+//Maya 2016 Project Definition
 
 workspace -fr "images" "images";
 workspace -fr "mayaAscii" "scenes";
-workspace -fr "FBX export" "data";
 workspace -fr "OBJ" "data";
 workspace -fr "particles" "particles";
 workspace -fr "mayaBinary" "scenes";
+workspace -fr "templates" "assets";
+workspace -fr "FBX export" "data";
