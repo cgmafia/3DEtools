@@ -19,6 +19,7 @@ github/danielforgacs
 #
 # import sdv's python vector lib...
 
+import os
 from vl_sdv import *
 
 ### functions...
@@ -70,15 +71,17 @@ def prepareImagePath(path,startframe):
     return path
 
 
-def export_maya():
+def export_maya(melpath):
     ### main script...
 
     ### search for camera point group...
 
     campg   = None
     pgl = tde4.getPGroupList()
+
     for pg in pgl:
         if tde4.getPGroupType(pg)=="CAMERA": campg = pg
+
     if campg==None:
         tde4.postQuestionRequester("Export Maya...","Error, there is no camera point group.","Ok")
 
@@ -102,7 +105,13 @@ def export_maya():
 
     if ret==1:
         yup = 1
-        path    = tde4.getWidgetValue(req,"file_browser")
+### CUSTOM UPDATE
+### AUTO FILE PATH
+        # path    = tde4.getWidgetValue(req,"file_browser")
+        # print path
+        path = melpath
+### ^^^
+
         frame0  = float(tde4.getWidgetValue(req,"startframe_field"))
         frame0  -= 1
         hide_ref = tde4.getWidgetValue(req,"hide_ref_frames")
@@ -379,6 +388,41 @@ def export_maya():
                 tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
 
+###########################
+###########################
+###########################
+
+def create_filepaths():
+    fix_per = lambda s: s.replace('\\', '/')
+    projectpath = os.path.abspath(tde4.getProjectPath())
+    root = os.path.dirname(projectpath)
+    projectname = os.path.basename(projectpath)[:-4]
+
+    exportfolder = os.path.join(root, 'export', projectname)
+
+    if not os.path.exists(exportfolder):
+        os.makedirs(fix_per(exportfolder))
+
+    melpath = os.path.join(exportfolder, projectname + '.mel')
+
+    filepaths = {
+            '3De': projectpath,
+            'exportfolder': exportfolder,
+            'mel': melpath,
+            }
+
+    return filepaths
+
+
+def main():
+    filepaths = create_filepaths()
+    print '--> 3De project path: ', filepaths['3De']
+    print '--> Export folder: ', filepaths['exportfolder']
+    print '--> mel script path: ', filepaths['mel']
+
+    export_maya(filepaths['mel'])
+
+
 
 if __name__ == '__main__':
-    export_maya()
+    main()
