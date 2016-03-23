@@ -88,6 +88,8 @@ def export_maya(melpath):
 
     ### open requester...
 
+### TRUN OFF
+### REQUESTER
     try:
         req = _export_requester_maya
     except (ValueError,NameError,TypeError):
@@ -102,15 +104,19 @@ def export_maya(melpath):
     tde4.setWidgetValue(req,"startframe_field",str(offset))
 
     ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+### SET REQUESTER PRESSED "ok"
+    ret = 1
+### ---------------------------
 
     if ret==1:
         yup = 1
+
 ### CUSTOM UPDATE
 ### AUTO FILE PATH
         # path    = tde4.getWidgetValue(req,"file_browser")
         # print path
         path = melpath
-### ^^^
+### --------------------
 
         frame0  = float(tde4.getWidgetValue(req,"startframe_field"))
         frame0  -= 1
@@ -182,8 +188,10 @@ def export_maya(melpath):
                         f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
                         f.write("setAttr ($imagePlane + \".offsetY\") %.15f;\n"%lco_y)
 
-                        if camType=="SEQUENCE": f.write("setAttr ($imagePlane+\".useFrameExtension\") 1;\n")
-                        else:           f.write("setAttr ($imagePlane+\".useFrameExtension\") 0;\n")
+                        if camType=="SEQUENCE":
+                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 1;\n")
+                        else:
+                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 0;\n")
 
                         f.write("expression -n \"frame_ext_expression\" -s ($imagePlane+\".frameExtension=frame\");\n")
                         path    = tde4.getCameraPath(cam)
@@ -198,8 +206,12 @@ def export_maya(melpath):
                         f.write("\n// parent camera to scene group...\n")
                         f.write("parent $cameraTransform $sceneGroupName;\n")
 
-                        if camType=="REF_FRAME" and hide_ref:
+                    ### UPDATED TO ALWAYS HIDE
+                    ### REFERENCE FRAME CAMERAS
+                        # if camType=="REF_FRAME" and hide_ref:
+                        if camType=="REF_FRAME":
                             f.write("setAttr ($cameraTransform +\".visibility\") 0;\n")
+                    ### ----------------------->
 
                         ### animate camera...
                         if camType!="REF_FRAME":
