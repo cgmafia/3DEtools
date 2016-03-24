@@ -103,7 +103,7 @@ def export_maya(melpath):
     offset  = tde4.getCameraFrameOffset(cam)
     tde4.setWidgetValue(req,"startframe_field",str(offset))
 
-    ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
+    # ret = tde4.postCustomRequester(req,"Export Maya (MEL-Script)...",600,0,"Ok","Cancel")
 ### SET REQUESTER PRESSED "ok"
     ret = 1
 ### ---------------------------
