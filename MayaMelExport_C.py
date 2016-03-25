@@ -183,11 +183,13 @@ def export_maya(melpath):
                         ### create camera...
                         f.write("\n// create camera %s...\n"%name)
                         f.write("string $cameraNodes[] = `camera -name \"%s\" -hfa %.15f  -vfa %.15f -fl %.15f -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff \"overscan\"`;\n"%(name,fback_w,fback_h,focal))
-                        f.write("string $cameraTransform = $cameraNodes[0];\n")
-                        f.write("string $cameraShape = $cameraNodes[1];\n")
-                        f.write("xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;\n")
-                        f.write("setAttr ($cameraShape+\".horizontalFilmOffset\") %.15f;\n"%lco_x);
-                        f.write("setAttr ($cameraShape+\".verticalFilmOffset\") %.15f;\n"%lco_y);
+                        f.write("string $cameraTransform = $cameraNodes[0];\n"
+                                "string $cameraShape = $cameraNodes[1];\n"
+                                "xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;\n")
+
+                        f.write("setAttr ($cameraShape+\".horizontalFilmOffset\") %.15f;\n"%lco_x)
+                        f.write("setAttr ($cameraShape+\".verticalFilmOffset\") %.15f;\n"%lco_y)
+
                         p3d = tde4.getPGroupPosition3D(campg,cam,1)
                         p3d = convertZup(p3d,yup)
                         f.write("xform -translation %.15f %.15f %.15f $cameraTransform;\n"%(p3d[0],p3d[1],p3d[2]))
@@ -265,7 +267,7 @@ def export_maya(melpath):
                 f.write("\n// create camera point group...\n")
                 name    = "cameraPGroup_%s_1"%validName(tde4.getPGroupName(campg))
                 f.write("string $pointGroupName = `group -em -name  \"%s\" -parent $sceneGroupName`;\n"%name)
-                f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
+                ### f.write("$pointGroupName = ($sceneGroupName + \"|\" + $pointGroupName);\n")
                 f.write("\n")
 
                 ### write points...
@@ -420,7 +422,7 @@ def export_maya(melpath):
 ###########################
 
 def create_filepaths():
-    fix_per = lambda s: s.replace('\\', '/')
+    fix_slash = lambda s: s.replace('\\', '/')
     projectpath = os.path.abspath(tde4.getProjectPath())
     root = os.path.dirname(projectpath)
     projectname = os.path.basename(projectpath)[:-4]
@@ -428,11 +430,12 @@ def create_filepaths():
     exportfolder = os.path.join(root, 'export', projectname)
 
     if not os.path.exists(exportfolder):
-        os.makedirs(fix_per(exportfolder))
+        os.makedirs(fix_slash(exportfolder))
 
     melpath = os.path.join(exportfolder, projectname + '.mel')
 
     filepaths = {
+            'projectname': projectname,
             '3De': projectpath,
             'exportfolder': exportfolder,
             'mel': melpath,
@@ -448,6 +451,20 @@ def import_to_maya(path):
 
 
 
+def append_to_file(mel, path):
+    with open(path, 'a') as f:
+        f.write(mel)
+
+
+def setup_mm(projectname):
+    mel = ('rename $sceneGroupName {group}_;'
+            )
+    mel = mel.format(group=projectname)
+
+    return mel
+
+
+
 def main():
     print '\n^^^^^^^^^^^^^^^^^^^^^^'
     filepaths = create_filepaths()
@@ -457,6 +474,10 @@ def main():
 
     export_maya(filepaths['mel'])
     print '\n--> mel script exported'
+
+    mel = setup_mm(filepaths['projectname'])
+
+    append_to_file(mel, filepaths['mel'])
 
     try:
         import_to_maya(filepaths['mel'])
