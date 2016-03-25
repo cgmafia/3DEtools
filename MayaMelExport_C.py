@@ -20,7 +20,22 @@ github/danielforgacs
 # import sdv's python vector lib...
 
 import os
+import socket
 from vl_sdv import *
+
+
+class MayaConnectWrapper(object):
+    def __enter__(self):
+        self.maya = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.maya.connect(('localhost', 6005))
+        except:
+            print('<-- Maya import failed -->')
+
+        return self.maya
+
+    def __exit__(self, type, value, traceback):
+        self.maya.close()
 
 ### functions...
 
@@ -395,7 +410,7 @@ def export_maya(melpath):
                 f.write("xform -zeroTransformPivots -rotateOrder zxy -translation %.15f %.15f %.15f -scale %.15f %.15f %.15f -rotation %.15f %.15f %.15f $sceneGroupName;\n\n"%(p3d[0],p3d[1],p3d[2],s,s,s,rot[0],rot[1],rot[2]))
                 f.write("\n")
                 f.close()
-                tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
+                ### tde4.postQuestionRequester("Export Maya...","Project successfully exported.","Ok")
             else:
                 tde4.postQuestionRequester("Export Maya...","Error, couldn't open file.","Ok")
 
@@ -426,13 +441,30 @@ def create_filepaths():
     return filepaths
 
 
+def import_to_maya(path):
+    with MayaConnectWrapper() as maya:
+        maya.send('print "{path}";'.format(path=path))
+        maya.send('source "{path}";'.format(path=path.replace('\\', '/')))
+
+
+
 def main():
+    print '\n^^^^^^^^^^^^^^^^^^^^^^'
     filepaths = create_filepaths()
-    print '--> 3De project path: ', filepaths['3De']
-    print '--> Export folder: ', filepaths['exportfolder']
-    print '--> mel script path: ', filepaths['mel']
+    print '... 3De project path: ', filepaths['3De']
+    print '... Export folder: ', filepaths['exportfolder']
+    print '... mel script path: ', filepaths['mel']
 
     export_maya(filepaths['mel'])
+    print '\n--> mel script exported'
+
+    try:
+        import_to_maya(filepaths['mel'])
+        print('--> mel sourced in Maya')
+    except:
+        pass
+
+    print '\n--> export finished...'
 
 
 
