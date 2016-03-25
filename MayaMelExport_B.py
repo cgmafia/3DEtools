@@ -6,13 +6,13 @@ github/danielforgacs
 """
 #
 #
-# 3DE4.script.name: Auto Mel Export - B
-#
-# 3DE4.script.version:  v0.1.0
-#
-# 3DE4.script.gui:  Main Window::Azure
-#
-# 3DE4.script.comment:  Creates a MEL script file that contains all project data, which can be imported into Autodesk Maya.
+### 3DE4.script.name: Auto Mel Export - B
+###
+### 3DE4.script.version:  v0.1.0
+###
+### 3DE4.script.gui:  Main Window::Azure
+###
+### 3DE4.script.comment:  Creates a MEL script file that contains all project data, which can be imported into Autodesk Maya.
 #
 #
 
