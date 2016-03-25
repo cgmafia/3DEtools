@@ -144,22 +144,24 @@ def export_maya(melpath):
             f   = open(path,"w")
 
             if not f.closed:
-                f.write("//\n// Maya/MEL export data written by %s\n"%tde4.get3DEVersion())
-                f.write("//\n// All lengths are in centimeter, all angles are in degree.\n//\n\n")
+                f.write("//\n// Maya/MEL export data written by %s" % tde4.get3DEVersion())
+                f.write("\n//\n// All lengths are in centimeter, all angles are in degree.\n//")
 
                 ### write scene group...
 
-                f.write("// create scene group...\n")
-                f.write("string $sceneGroupName = `group -em -name \"Scene\"`;\n")
+                f.write("\n\n// create scene group...\n"
+                        "string $sceneGroupName = `group -em -name \"Scene\"`;\n")
 
                 ### write cameras...
 
                 cl  = tde4.getCameraList()
                 index   = 1
+
                 for cam in cl:
                     camType     = tde4.getCameraType(cam)
                     noframes    = tde4.getCameraNoFrames(cam)
                     lens        = tde4.getCameraLens(cam)
+
                     if lens!=None:
                         name        = validName(tde4.getCameraName(cam))
                         name        = "%s_%s_1"%(name,index)
@@ -182,7 +184,9 @@ def export_maya(melpath):
 
                         ### create camera...
                         f.write("\n// create camera %s...\n"%name)
-                        f.write("string $cameraNodes[] = `camera -name \"%s\" -hfa %.15f  -vfa %.15f -fl %.15f -ncp 0.01 -fcp 10000 -shutterAngle 180 -ff \"overscan\"`;\n"%(name,fback_w,fback_h,focal))
+                        f.write("string $cameraNodes[] = `camera -name \"%s\" -hfa %.15f"
+                                "  -vfa %.15f -fl %.15f -ncp 0.01 -fcp 10000 -shutterAngle 180"
+                                " -ff \"overscan\"`;\n"%(name,fback_w,fback_h,focal))
                         f.write("string $cameraTransform = $cameraNodes[0];\n"
                                 "string $cameraShape = $cameraNodes[1];\n"
                                 "xform -zeroTransformPivots -rotateOrder zxy $cameraTransform;\n")
@@ -199,29 +203,33 @@ def export_maya(melpath):
                         f.write("xform -scale 1 1 1 $cameraTransform;\n")
 
                         ### image plane...
-                        f.write("\n// create image plane...\n")
-                        f.write("string $imagePlane = `createNode imagePlane`;\n")
-                        f.write("cameraImagePlaneUpdate ($cameraShape, $imagePlane);\n")
-                        f.write("setAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
+                        f.write("\n// create image plane..."
+                                "\nstring $imagePlane = `createNode imagePlane`;"
+                                "\ncameraImagePlaneUpdate ($cameraShape, $imagePlane);")
+
+                        f.write("\nsetAttr ($imagePlane + \".offsetX\") %.15f;\n"%lco_x)
                         f.write("setAttr ($imagePlane + \".offsetY\") %.15f;\n"%lco_y)
 
-                        if camType=="SEQUENCE":
-                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 1;\n")
+                        if camType == "SEQUENCE":
+                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 1;")
                         else:
-                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 0;\n")
+                            f.write("setAttr ($imagePlane+\".useFrameExtension\") 0;")
 
-                        f.write("expression -n \"frame_ext_expression\" -s ($imagePlane+\".frameExtension=frame\");\n")
-                        path    = tde4.getCameraPath(cam)
-                        sattr   = tde4.getCameraSequenceAttr(cam)
-                        path    = prepareImagePath(path,sattr[0])
-                        f.write("setAttr ($imagePlane + \".imageName\") -type \"string\" \"%s\";\n"%(path))
-                        f.write("setAttr ($imagePlane + \".fit\") 4;\n")
-                        f.write("setAttr ($imagePlane + \".displayOnlyIfCurrent\") 1;\n")
-                        f.write("setAttr ($imagePlane  + \".depth\") (9000/2);\n")
+                        f.write("\nexpression -n \"frame_ext_expression\" "
+                                "-s ($imagePlane+\".frameExtension=frame\");")
+
+                        path = tde4.getCameraPath(cam)
+                        sattr = tde4.getCameraSequenceAttr(cam)
+                        path = prepareImagePath(path,sattr[0])
+
+                        f.write("\nsetAttr ($imagePlane + \".imageName\") -type \"string\" \"%s\";\n"%(path))
+                        f.write("setAttr ($imagePlane + \".fit\") 4;"
+                                "\nsetAttr ($imagePlane + \".displayOnlyIfCurrent\") 1;"
+                                "\nsetAttr ($imagePlane  + \".depth\") (9000/2);")
 
                         ### parent camera to scene group...
-                        f.write("\n// parent camera to scene group...\n")
-                        f.write("parent $cameraTransform $sceneGroupName;\n")
+                        f.write("\n\n// parent camera to scene group..."
+                                "\nparent $cameraTransform $sceneGroupName;\n")
 
                     ### UPDATED TO ALWAYS HIDE
                     ### REFERENCE FRAME CAMERAS
