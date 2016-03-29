@@ -2,8 +2,4 @@
 
 workspace -fr "images" "images";
 workspace -fr "mayaAscii" "scenes";
-workspace -fr "OBJ" "data";
-workspace -fr "particles" "particles";
 workspace -fr "mayaBinary" "scenes";
-workspace -fr "templates" "assets";
-workspace -fr "FBX export" "data";
