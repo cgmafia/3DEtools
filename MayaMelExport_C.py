@@ -245,6 +245,7 @@ def export_maya(melpath):
                             f.write("\n")
 
                         frame   = 1
+
                         while frame<=noframes:
                             ### rot/pos...
                             p3d = tde4.getPGroupPosition3D(campg,cam,frame)
@@ -256,9 +257,15 @@ def export_maya(melpath):
                                 rot = [ angleMod360(rot0[0],rot[0]), angleMod360(rot0[1],rot[1]), angleMod360(rot0[2],rot[2]) ]
 
                             rot0    = rot
-                            f.write("setKeyframe -at translateX -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[0]))
-                            f.write("setKeyframe -at translateY -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[1]))
-                            f.write("setKeyframe -at translateZ -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[2]))
+
+                            # f.write("setKeyframe -at translateX -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[0]))
+                            # f.write("setKeyframe -at translateY -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[1]))
+                            # f.write("setKeyframe -at translateZ -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[2]))
+
+                            for k, trans in enumerate('XYZ'):
+                                f.write("setKeyframe -at translate{trans}".format(trans=trans))
+                                f.write(" -t %d -v %.15f $cameraTransform; "%(frame+frame0,p3d[k]))
+
                             f.write("setKeyframe -at rotateX -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[0]))
                             f.write("setKeyframe -at rotateY -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[1]))
                             f.write("setKeyframe -at rotateZ -t %d -v %.15f $cameraTransform; "%(frame+frame0,rot[2]))
